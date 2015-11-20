@@ -94,6 +94,7 @@ class inventoryDatabase:
                     ("vendor_id","text"),
                     ("vendor","text")])
         self.columns = self.column_dict.keys()
+        self.open_database()
 
     def open_database(self):
         # Try connecting to the default database
@@ -201,9 +202,8 @@ def strip_units(value):
     # no translation needed
     else:
         return value
-    
-def run():
-    page = []
+
+def query_test_knife():
     try:
         page = urlopen("{file_full_path}{file_name}".format(file_full_path='file:///home/casey/src/knife_scraper/html/',file_name='spyderco.html'))
     except URLError as e:
@@ -212,18 +212,29 @@ def run():
     specs=soup.findAll('div', {'class':"prodSpecs tabContent show-this-tab"})
     specKeys = specs[0].findAll('span', {"class":"attName"})
     specValues = specs[0].findAll('span', {"class":"attValue"})
-    Knife = OrderedDict()
+    knife = OrderedDict()
     for k,v in zip(specKeys,specValues):
         vs = strip_units(v.text)
         key = k.text.strip(":")
-        Knife[key] = vs
+        knife[key] = vs
     # these attributes have to be pulled from somewhere else
-    Knife["Date Added"] = "11/18/2015"
-    Knife["Vendor Name"] = "BHQ"
-    Knife["Vendor ID"] = 10801
+    knife["Date Added"] = "11/18/2015"
+    knife["Vendor Name"] = "BHQ"
+    knife["Vendor ID"] = 10801
     Knife["Price"] = 134.95
+    return knife
+
+def queryKnife():
+    return knife
+
+def run():
+    page = []
     #specValues = specs[0].findall('span', {"class":"attValue"})
     # Get the first table (this contains a huge list
+    knife = query_test_knife
+    print(knife)
+    #ib = inventoryDatabase()
+    #ib.add_knife(knife)
 
 if __name__ == '__main__':
     run()
