@@ -1,10 +1,18 @@
 #!/usr/bin/env python
+# ddg.py - Library for querying DuckDuckGo.com
+# 
+# Copyright (c) 2015 Casey Bartlett <caseytb@bu.edu>
+# 
+# See LICENSE for terms of usage, modification and redistribution.
+
 from bs4 import BeautifulSoup as bs
 from urllib2 import urlopen, URLError
-import sqlite3
 from collections import OrderedDict
-import sys
+import datetime
+import sqlite3
 import copy
+import sys
+import re
 
 def checkTableExists(dbcon, tablename):
     """
@@ -31,6 +39,7 @@ class inventoryDatabase:
         self.foo = []
         self.database_file = "inventory.db"
         self.connection = []
+        self.tablename = "blade_inventory"
         self.name_map = dict({
             "Overall Length":"overall_lengthMKS",
             "Blade Length":"blade_lengthMKS",
@@ -128,7 +137,7 @@ class inventoryDatabase:
         Create the database. This is a standard layout
         TODO: generate this text from self.column_dict
         """
-        self.connection.execute('''CREATE TABLE blade_inventory
+        self.connection.execute('''CREATE TABLE {table}
                 (date_added text,
                 overall_lengthMKS real,
                 blade_lengthMKS real,
@@ -155,20 +164,32 @@ class inventoryDatabase:
                 country_of_origin text,
                 usage text,
                 price real,
-                vendor_id text,
-                vendor text)''')
+                vendor_id text PRIMARY KEY,
+                vendor text)'''.format(table=self.tablename))
+
+    def has_item(self,key,id):
+        self.connection.execute("SELECT EXISTS(SELECT 1 FROM {table} WHERE {target}=\"{value}\" LIMIT 1);".format(table=self.tablename, target=key, value=id))
+        cursor =self.connection.cursor()
+        data = cursor.fetchall()
+        print data
+        return len(data) > 0
 
     def add_knife(self, knife_dict):
         """
         Adds a knife to the database. 
         @param: knife_dict is a dict of key value pairs following database format listed  in create_db(self)
         """
+        key ="Vendor ID"
+        if not knife_dict.has_key(key):
+            print("No vendor_id found!")
+        if self.has_item(self.name_map[key],knife_dict[key]):
+            print("knife with {k} already in {tb}".format(k=key,tb=self.tablename))
+            return
         ld = len(self.column_dict)
         knife_item = self._order_tuple(knife_dict)
         #print knife_item
         #print len(knife_item)
-        # A weird 
-        self.connection.execute("INSERT INTO blade_inventory VALUES ({}{})".format("?,"*(ld-1),"?"), knife_item)
+        self.connection.execute("INSERT INTO {table} ".format(table=self.tablename)+"VALUES ({}{})".format("?,"*(ld-1),"?"), knife_item)
         self.connection.commit()
 
     def _order_tuple(self, knife_dict):
@@ -203,6 +224,67 @@ def strip_units(value):
     else:
         return value
 
+# for future statistics - also should get the price in db as text and instances of price should be PriceQuantity
+class PriceQuantity:
+    def __init__(self, dollars, cents):
+        self.dollars = int(dollars)
+        self.cents = int(cents)
+    def __add__(self, other):
+        total_cents = self.cents + other.cents
+        remaining_cents = total_cents % 100
+        dollars_from_cents = total_cents / 100
+        return PriceQuantity(dollars_from_cents, remaining_cents)
+    def __repr__(self):
+        return "{}.{}".format(self.dollars, self.cents)
+    def __lt__(self, other):
+        return 100*self.dollars + self.cents < 100*other.dollars + other.cents 
+    def __gt__(self,other):
+        return 100*self.dollars + self.cents > 100*other.dollars + other.cents 
+    def __eq__(self,other):
+        return 100*self.dollars + self.cents == 100*other.dollars + other.cents 
+
+def parse_price_element(price_element):
+    """
+    @price_element a text string like u'Our Price: 134.23'
+    """ 
+    items = price_element.split(":")
+    price = items[1].strip()
+    price_no_symbol = price.strip("$")
+    dollars, cents =price_no_symbol.split(".")
+    return PriceQuantity(dollars,cents)
+
+def query_bhq_knife(endpoint):
+    try:
+        page = urlopen("{url}".format(url=endpoint))
+    except URLError as e:
+        print(e.reason)
+    soup = bs(page)
+
+    specs=soup.findAll('div', {'class':"prodSpecs tabContent show-this-tab"})
+    specKeys = specs[0].findAll('span', {"class":"attName"})
+    specValues = specs[0].findAll('span', {"class":"attValue"})
+    knife = OrderedDict()
+    for k,v in zip(specKeys,specValues):
+        vs = strip_units(v.text)
+        key = k.text.strip(":")
+        knife[key] = vs
+
+    # Price - probably need to use price repr
+    item_selection= soup.findAll("span",{"class": "item-descr-price"})
+    price_element = item_selection[0].find("div", {"class" : "price" }).text
+    price = parse_price_element(price_element)
+    
+    # BHQ item number
+    item = soup.findAll("span", {"class":"itemNumber"})
+    bhq_item_string = item[0].text
+    bhq_item_num  = bhq_item_string.split("-")[-1]
+    today = datetime.date.today()
+    knife["Date Added"] = today.strftime(u"%x")
+    knife["Vendor Name"] = u"BHQ"
+    knife["Vendor ID"] = unicode(bhq_item_num)
+    knife["Price"] = unicode(price) 
+    return knife
+
 def query_test_knife():
     try:
         page = urlopen("{file_full_path}{file_name}".format(file_full_path='file:///home/casey/src/knife_scraper/html/',file_name='spyderco.html'))
@@ -217,11 +299,17 @@ def query_test_knife():
         vs = strip_units(v.text)
         key = k.text.strip(":")
         knife[key] = vs
+
+    item_selection= soup.findAll("span",{"class": "item-descr-price"})
+    price_element = item_selection[0].find("div", {"class" : "price" }).text
+    print price_element
+    price = parse_price_element(price_element)
+    
     # these attributes have to be pulled from somewhere else
     knife["Date Added"] = "11/18/2015"
     knife["Vendor Name"] = "BHQ"
     knife["Vendor ID"] = 10801
-    Knife["Price"] = 134.95
+    knife["Price"] = price
     return knife
 
 def queryKnife():
@@ -231,10 +319,18 @@ def run():
     page = []
     #specValues = specs[0].findall('span', {"class":"attValue"})
     # Get the first table (this contains a huge list
-    knife = query_test_knife
-    print(knife)
+    knife = query_test_knife()
+    print knife
+    #print(knife)
     #ib = inventoryDatabase()
     #ib.add_knife(knife)
+# performs a test run where a database is created and a knife is added after parsing BHQ
+def test_run():
+    # Get this url with ddg search api
+    url= "http://www.bladehq.com/item--Spyderco-Paramilitary-2--7920"
+    knife = query_bhq_knife(url)
+    ib = inventoryDatabase()
+    ib.add_knife(knife)
 
 if __name__ == '__main__':
     run()
