@@ -1,6 +1,6 @@
 from sopel import  *
 from ddg import ddg
-from extract_blade_info import query_bhq_knife,KnifeFormatter,replaceDictKeys
+from extract_blade_info import query_bhq_knife,KnifeFormatter,replaceDictKeys,BHQNAME_TO_DBNAME
 
 @module.commands('knife')
 def knife(bot, trigger):
