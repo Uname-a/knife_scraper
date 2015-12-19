@@ -1,5 +1,5 @@
 from sopel import  *
-from extractr_blade_info import query_bhq_knife,KnifeFormatter
+from extract_blade_info import query_bhq_knife,KnifeFormatter
 
 @module.commands('knife')
 def knife(bot, trigger):
