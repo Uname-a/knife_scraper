@@ -14,7 +14,7 @@ def knife(bot, trigger):
     url = d.results[0]
     knife = query_bhq_knife(url)
     if not knife:
-        bot.reply('Sorry I didn\'t find anything at {url}'.format(url=url))
+        bot.reply('Sorry I didn\'t find anything I could parse, but I did find this {url}'.format(url=url))
     else:
         d = replaceDictKeys(BHQNAME_TO_DBNAME,knife)
         kf = KnifeFormatter()
