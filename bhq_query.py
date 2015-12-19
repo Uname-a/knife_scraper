@@ -1,4 +1,5 @@
 from sopel import  *
+from ddg import ddg
 from extract_blade_info import query_bhq_knife,KnifeFormatter
 
 @module.commands('knife')
