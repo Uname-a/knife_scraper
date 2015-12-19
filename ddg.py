@@ -43,7 +43,6 @@ class ddg:
             if (self.results):
                 break
             self.results.append(r.a['href'])
-            print r.a['href']
         if not r:
             print("{} not found".format(formatted_query))
 
