@@ -277,6 +277,9 @@ def query_bhq_knife(endpoint):
     soup = bs(page)
 
     specs=soup.findAll('div', {'class':"prodSpecs tabContent show-this-tab"})
+    # if we can't find the item # then this isn't the appropriate page to continue parsing
+    if not specs:
+        return []
     specKeys = specs[0].findAll('span', {"class":"attName"})
     specValues = specs[0].findAll('span', {"class":"attValue"})
 

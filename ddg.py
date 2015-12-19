@@ -33,6 +33,7 @@ class ddg:
     def json_parser(self):
         pass
     def soup_parser(self,formatted_query):
+        self.results = []
         try:
             page = urlopen(formatted_query)
         except URLError as e:
