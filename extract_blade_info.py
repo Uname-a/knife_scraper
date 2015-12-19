@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup as bs
 from urllib2 import urlopen, URLError
 from collections import OrderedDict
 from sopel import formatting
-from string import Formatter
+from string import Template
 import exceptions
 import datetime
 import sqlite3
@@ -346,29 +346,28 @@ class KnifeFormatter():
     # function due to the coloring
     def setupDefault(self):
         # to check the string construct 
-        fmt = "{model}" +\
-                " {blade_lengthMKS} m in length" +\
-                " of {blade_material} steel [$" +\
-                formatting.color("{price}",fg=formatting.colors.GREEN)+\
-                "]"
+        fmt = Template("$model" +\
+                " $blade_lengthMKS m blade length" +\
+                " of $blade_material steel priced at [ $$" +\
+                formatting.color("$price",fg=formatting.colors.GREEN)+\
+                " ]")
         try:
-            fmt.format(**INVENTORY_ITEMS)
+            fmt.safe_substitute(**INVENTORY_ITEMS)
             return fmt
         except exceptions.KeyError as e:
            print("Key {} not available in".format(e))
            return ""
     def setFormat(self,format_string):
-        self.format_string 
         # if we're successful return empty
         try:
-            format_string.format(**inventoryDatabase.column_dict)
-            self.format_string = format_string
+            tmp = Template(format_string)
+            self.format_string = tmp.safe_substitute(**INVENTORY_ITEMS)
             return  []
         except exceptions.KeyError as e:
             return "Key {} not available in knife".format(e)
     # knife is expected to be a dict
     def formattedKnife(self,knife):
-        return self.format_string.format(**knife)
+        return self.format_string.safe_substitute(**knife)
 
 def run():
     page = []

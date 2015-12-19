@@ -16,8 +16,15 @@ def knife(bot, trigger):
     if not knife:
         bot.reply('Sorry I didn\'t find anything I could parse, but I did find this {url}'.format(url=url))
     else:
-        d = replaceDictKeys(BHQNAME_TO_DBNAME,knife)
-        kf = KnifeFormatter()
-        results_string = kf.formattedKnife(d)
-        bot.reply(results_string)
+        # need to handle "product type" better ( search again if not knife )
+        if knife["Product Type"] == "Knife":
+            d = replaceDictKeys(BHQNAME_TO_DBNAME,knife)
+            kf = KnifeFormatter()
+            results_string = kf.formattedKnife(d)
+            bot.reply(results_string)
+        else:
+            d = replaceDictKeys(BHQNAME_TO_DBNAME,knife)
+            kf = KnifeFormatter()
+            results_string = kf.formattedKnife(d)
+            bot.reply("I know this isn't a knife, but its what i found:" + results_string)
 
