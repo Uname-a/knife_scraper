@@ -1,5 +1,0 @@
-xmltodict
-pytz
-praw
-pyenchant
-pygeoip

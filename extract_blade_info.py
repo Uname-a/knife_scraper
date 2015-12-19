@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup as bs
 from urllib2 import urlopen, URLError
 from collections import OrderedDict
 from sopel import formatting
+from string import Formatter
 import exceptions
 import datetime
 import sqlite3
@@ -75,7 +76,18 @@ BHQNAME_TO_DBNAME= dict({
     "Vendor ID":"vendor_id",
     "Vendor Name":"vendor",
     "Date Added":"date_added"})
- 
+
+def replaceDictKeys(key_map, dict_to_change):
+    d = dict()
+    for k,v in key_map.iteritems():
+        if k in dict_to_change:
+            d[v] = dict_to_change[k]
+    return d
+def getSubDict(keys, theDict):
+    d = dict()
+    for k in keys:
+        d[k] = theDict[k]
+
 def checkTableExists(dbcon, tablename):
     """
     Database utility to check for existence of table
@@ -193,8 +205,6 @@ class inventoryDatabase:
             return
         ld = len(self.column_dict)
         knife_item = self._order_tuple(knife_dict)
-        #print knife_item
-        #print len(knife_item)
         self.connection.execute("INSERT INTO {table} ".format(table=self.tablename)+"VALUES ({}{})".format("?,"*(ld-1),"?"), knife_item)
         self.connection.commit()
 
@@ -334,12 +344,11 @@ class KnifeFormatter():
     def setupDefault(self):
         # to check the string construct 
         fmt = "{model}" +\
-                " {blade_lengthMKS}" +\
-                " {blade_material} [$" +\
+                " {blade_lengthMKS} m in length" +\
+                " of {blade_material} steel [$" +\
                 formatting.color("{price}",fg=formatting.colors.GREEN)+\
                 "]"
         try:
-            print INVENTORY_ITEMS
             fmt.format(**INVENTORY_ITEMS)
             return fmt
         except exceptions.KeyError as e:
@@ -356,7 +365,7 @@ class KnifeFormatter():
             return "Key {} not available in knife".format(e)
     # knife is expected to be a dict
     def formattedKnife(self,knife):
-        return self.format_string.format(knife)
+        return self.format_string.format(**knife)
 
 def run():
     page = []
@@ -374,12 +383,14 @@ def test_run():
     query_string = "paramilitary 2"
     url= "http://www.bladehq.com/item--Spyderco-Paramilitary-2--7920"
     knife = query_bhq_knife(url)
+    print "This is the knife:"
     print knife
+    d = replaceDictKeys(BHQNAME_TO_DBNAME,knife)
     if knife:
         #ib = inventoryDatabase()
         #ib.add_knife(knife)
         kf = KnifeFormatter()
-        print(kf.formattedKnife(knife))
+        print(kf.formattedKnife(d))
     else:
         print "I couldn't find the information {knife} but here's the first url I could find: {url}".format(knife = query_string,url=url)
 
