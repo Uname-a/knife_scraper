@@ -8,12 +8,74 @@
 from bs4 import BeautifulSoup as bs
 from urllib2 import urlopen, URLError
 from collections import OrderedDict
+from sopel import formatting
+import exceptions
 import datetime
 import sqlite3
 import copy
 import sys
 import re
 
+INVENTORY_ITEMS =  OrderedDict([("date_added","text"),
+    ("overall_lengthMKS","real"),
+    ("blade_lengthMKS","real"),
+    ("cutting_edgeMKS","real"),
+    ("blade_thicknessMKS","real"),
+    ("blade_material","text"),
+    ("blade_style","text"),
+    ("blade_grind","text"),
+    ("blade_finish","text"),
+    ("handle_lengthMKS","real"),
+    ("handle_thicknessMKS","real"),
+    ("handle_material","text"),
+    ("color","text"),
+    ("frame_liner","text"),
+    ("massMKS","real"),
+    ("configuration","text"),
+    ("clip_configurations","text"),
+    ("knife_type","text"),
+    ("open_type","text"),
+    ("lock_type","text"),
+    ("brand","text"),
+    ("model","text"),
+    ("model_number","text"),
+    ("country_of_origin","text"),
+    ("usage","text"),
+    ("price","real"),
+    ("vendor_id","text"),
+    ("vendor","text")])
+
+BHQNAME_TO_DBNAME= dict({
+    "Overall Length":"overall_lengthMKS",
+    "Blade Length":"blade_lengthMKS",
+    "Cutting Edge":"cutting_edgeMKS",
+    "Blade Thickness":"blade_thicknessMKS",
+    "Blade Material":"blade_material",
+    "Blade Style":"blade_style",
+    "Blade Grind":"blade_grind",
+    "Finish":"blade_finish",
+    "Edge Type":"edge_type",
+    "Handle Length":"handle_lengthMKS",
+    "Handle Thickness":"handle_thicknessMKS",
+    "Handle Material":"handle_material",
+    "Color":"color",
+    "Frame/Liner":"frame_liner",
+    "Weight":"massMKS",
+    "User":"configuration",
+    "Pocket Clip":"clip_configurations",
+    "Knife Type":"knife_type",
+    "Opener":"open_type",
+    "Lock Type":"lock_type",
+    "Brand":"brand",
+    "Model":"model",
+    "Model Number":"model_number",
+    "Country of Origin":"country_of_origin",
+    "Best Use":"usage",
+    "Price":"price",
+    "Vendor ID":"vendor_id",
+    "Vendor Name":"vendor",
+    "Date Added":"date_added"})
+ 
 def checkTableExists(dbcon, tablename):
     """
     Database utility to check for existence of table
@@ -40,68 +102,12 @@ class inventoryDatabase:
         self.database_file = "inventory.db"
         self.connection = []
         self.tablename = "blade_inventory"
-        self.name_map = dict({
-            "Overall Length":"overall_lengthMKS",
-            "Blade Length":"blade_lengthMKS",
-            "Cutting Edge":"cutting_edgeMKS",
-            "Blade Thickness":"blade_thicknessMKS",
-            "Blade Material":"blade_material",
-            "Blade Style":"blade_style",
-            "Blade Grind":"blade_grind",
-            "Finish":"blade_finish",
-            "Edge Type":"edge_type",
-            "Handle Length":"handle_lengthMKS",
-            "Handle Thickness":"handle_thicknessMKS",
-            "Handle Material":"handle_material",
-            "Color":"color",
-            "Frame/Liner":"frame_liner",
-            "Weight":"massMKS",
-            "User":"configuration",
-            "Pocket Clip":"clip_configurations",
-            "Knife Type":"knife_type",
-            "Opener":"open_type",
-            "Lock Type":"lock_type",
-            "Brand":"brand",
-            "Model":"model",
-            "Model Number":"model_number",
-            "Country of Origin":"country_of_origin",
-            "Best Use":"usage",
-            "Price":"price",
-            "Vendor ID":"vendor_id",
-            "Vendor Name":"vendor",
-            "Date Added":"date_added"})
+        self.name_map = BHQNAME_TO_DBNAME
         # reindex so reverse lookups are possible
         d_copy = copy.deepcopy(self.name_map)
         for k,v in d_copy.iteritems():
             self.name_map[v] = k
-        self.column_dict = OrderedDict([("date_added","text"),
-                    ("overall_lengthMKS","real"),
-                    ("blade_lengthMKS","real"),
-                    ("cutting_edgeMKS","real"),
-                    ("blade_thicknessMKS","real"),
-                    ("blade_material","text"),
-                    ("blade_style","text"),
-                    ("blade_grind","text"),
-                    ("blade_finish","text"),
-                    ("handle_lengthMKS","real"),
-                    ("handle_thicknessMKS","real"),
-                    ("handle_material","text"),
-                    ("color","text"),
-                    ("frame_liner","text"),
-                    ("massMKS","real"),
-                    ("configuration","text"),
-                    ("clip_configurations","text"),
-                    ("knife_type","text"),
-                    ("open_type","text"),
-                    ("lock_type","text"),
-                    ("brand","text"),
-                    ("model","text"),
-                    ("model_number","text"),
-                    ("country_of_origin","text"),
-                    ("usage","text"),
-                    ("price","real"),
-                    ("vendor_id","text"),
-                    ("vendor","text")])
+        self.column_dict = INVENTORY_ITEMS 
         self.columns = self.column_dict.keys()
         self.open_database()
 
@@ -263,6 +269,15 @@ def query_bhq_knife(endpoint):
     specs=soup.findAll('div', {'class':"prodSpecs tabContent show-this-tab"})
     specKeys = specs[0].findAll('span', {"class":"attName"})
     specValues = specs[0].findAll('span', {"class":"attValue"})
+
+    # BHQ item number
+    item = soup.findAll("span", {"class":"itemNumber"})
+    # couldn't find the item - just return empty
+    if not item:
+        return []
+    bhq_item_string = item[0].text
+    bhq_item_num  = bhq_item_string.split("-")[-1]
+
     knife = OrderedDict()
     for k,v in zip(specKeys,specValues):
         vs = strip_units(v.text)
@@ -274,10 +289,6 @@ def query_bhq_knife(endpoint):
     price_element = item_selection[0].find("div", {"class" : "price" }).text
     price = parse_price_element(price_element)
     
-    # BHQ item number
-    item = soup.findAll("span", {"class":"itemNumber"})
-    bhq_item_string = item[0].text
-    bhq_item_num  = bhq_item_string.split("-")[-1]
     today = datetime.date.today()
     knife["Date Added"] = today.strftime(u"%x")
     knife["Vendor Name"] = u"BHQ"
@@ -312,8 +323,40 @@ def query_test_knife():
     knife["Price"] = price
     return knife
 
-def queryKnife():
-    return knife
+class KnifeFormatter():
+    '''
+    We are just going to take input from the user and accept only items in the dict
+    We'll use the formatting module from sopel
+    '''
+    def __init__(self):
+        self.format_string = self.setupDefault()
+    # function due to the coloring
+    def setupDefault(self):
+        # to check the string construct 
+        fmt = "{model}" +\
+                " {blade_lengthMKS}" +\
+                " {blade_material} [$" +\
+                formatting.color("{price}",fg=formatting.colors.GREEN)+\
+                "]"
+        try:
+            print INVENTORY_ITEMS
+            fmt.format(**INVENTORY_ITEMS)
+            return fmt
+        except exceptions.KeyError as e:
+           print("Key {} not available in".format(e))
+           return ""
+    def setFormat(self,format_string):
+        self.format_string 
+        # if we're successful return empty
+        try:
+            format_string.format(**inventoryDatabase.column_dict)
+            self.format_string = format_string
+            return  []
+        except exceptions.KeyError as e:
+            return "Key {} not available in knife".format(e)
+    # knife is expected to be a dict
+    def formattedKnife(self,knife):
+        return self.format_string.format(knife)
 
 def run():
     page = []
@@ -324,13 +367,21 @@ def run():
     #print(knife)
     #ib = inventoryDatabase()
     #ib.add_knife(knife)
+
 # performs a test run where a database is created and a knife is added after parsing BHQ
 def test_run():
     # Get this url with ddg search api
+    query_string = "paramilitary 2"
     url= "http://www.bladehq.com/item--Spyderco-Paramilitary-2--7920"
     knife = query_bhq_knife(url)
-    ib = inventoryDatabase()
-    ib.add_knife(knife)
+    print knife
+    if knife:
+        #ib = inventoryDatabase()
+        #ib.add_knife(knife)
+        kf = KnifeFormatter()
+        print(kf.formattedKnife(knife))
+    else:
+        print "I couldn't find the information {knife} but here's the first url I could find: {url}".format(knife = query_string,url=url)
 
 if __name__ == '__main__':
     run()
