@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+# bhq_query.py - module for sopel to query blade head quarters site for knife data
+# 
+# Copyright (c) 2015 Casey Bartlett <caseytb@bu.edu>
+# 
+# See LICENSE for terms of usage, modification and redistribution.
+
 from sopel import  *
 from ddg import ddg
 from extract_blade_info import query_bhq_knife,KnifeFormatter,replaceDictKeys,BHQNAME_TO_DBNAME

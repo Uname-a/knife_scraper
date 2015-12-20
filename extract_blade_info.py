@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# ddg.py - Library for querying DuckDuckGo.com
+# extract_blade_info.py - collections of classes and functions for parsing blade_head_quarter's data into an IRC/sqlite3 compatible format
 # 
 # Copyright (c) 2015 Casey Bartlett <caseytb@bu.edu>
 # 
