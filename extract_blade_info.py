@@ -251,7 +251,7 @@ class PriceQuantity:
         dollars_from_cents = total_cents / 100
         return PriceQuantity(dollars_from_cents, remaining_cents)
     def __repr__(self):
-        return "{}.{}".format(self.dollars, self.cents)
+        return "{dollars}.{cents:02d}".format(dollars=self.dollars,cents=self.cents)
     def __lt__(self, other):
         return 100*self.dollars + self.cents < 100*other.dollars + other.cents 
     def __gt__(self,other):
