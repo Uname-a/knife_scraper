@@ -1,0 +1,14 @@
+[DEC 20, 2015]
+	- class KnifeFormatter needs to have units functionality (.su comand to set units from mks to inches)
+	- each field parsed by query_bhq_knife should receive attributes related to how they are represented in
+		a. KnifeFormatter
+		b. sqlite3 database
+	 The parsed item should retain original text values for formatting
+	 Knives should report in cm (not meters) if in mks
+	- if we get a page url starting with "cat" parse the "meta" tag with name="keywords" then perform a search on keywords
+		a. the content field of meta name="keywords" contains a comma delimited string of all the knives in the bhq category. After reading in this string:
+			i. split on ","
+			i. replace("&quote","") to remove quotes
+		b. alternatively it appears the last string in a content substring is the item model number - just append this to the original query to get to a unique page result ( seems to work on ddg fine)
+		c. not necessary to expand page results because ALL category results are present in the "keywords" meta tag ( all the results displayed in a browser are there from Javascript ).
+	- get Database feature working - inconclusive searchs can be time consuming (about 1 second / search - a bad search can mean 6 seconds of waiting where a database + fuzzy search is much faster ).

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# ddg.py - Library for querying DuckDuckGo.com
+# extract_blade_info.py - collections of classes and functions for parsing blade_head_quarter's data into an IRC/sqlite3 compatible format
 # 
 # Copyright (c) 2015 Casey Bartlett <caseytb@bu.edu>
 # 
@@ -266,6 +266,7 @@ def parse_price_element(price_element):
     items = price_element.split(":")
     price = items[1].strip()
     price_no_symbol = price.strip("$")
+    price_no_symbol = price_no_symbol.replace(",","")
     dollars, cents =price_no_symbol.split(".")
     return PriceQuantity(dollars,cents)
 
