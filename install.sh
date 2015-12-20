@@ -1,6 +1,6 @@
 #!/bin/bash
 # Copies python files into sopel modules directory... pretty horrible actually
-sopel_dir = ~/.sopel/knifeclub_modules
+sopel_dir=~/.sopel/knifeclub_modules
 
 if [ -d $sopel_dir ]
 then
