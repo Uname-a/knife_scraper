@@ -266,6 +266,7 @@ def parse_price_element(price_element):
     items = price_element.split(":")
     price = items[1].strip()
     price_no_symbol = price.strip("$")
+    price_no_symbol = price_no_symbol.replace(",","")
     dollars, cents =price_no_symbol.split(".")
     return PriceQuantity(dollars,cents)
 
