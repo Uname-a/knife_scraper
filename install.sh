@@ -1,7 +1,6 @@
 #!/bin/bash
 # Copies python files into sopel modules directory... pretty horrible actually
 sopel_dir=~/.sopel/knifeclub_modules
-=======
 # install.sh - shell script to copy files to sopel runtime directory
 # 
 # Copyright (c) 2015 Casey Bartlett <caseytb@bu.edu>
