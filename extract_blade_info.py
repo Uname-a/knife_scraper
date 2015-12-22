@@ -294,9 +294,9 @@ def query_bhq_knife(endpoint):
 
     knife = OrderedDict()
     for k,v in zip(specKeys,specValues):
-        vs = strip_units(v.text)
+        #vs = strip_units(v.text)
         key = k.text.strip(":")
-        knife[key] = vs
+        knife[key] = v.text
 
     # Price - probably need to use price repr
     item_selection= soup.findAll("span",{"class": "item-descr-price"})
