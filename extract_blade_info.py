@@ -351,7 +351,7 @@ class KnifeFormatter():
     def setupDefault(self):
         # to check the string construct 
         fmt = Template("$model" +\
-                " $blade_lengthMKS m blade length" +\
+                " $blade_lengthMKS blade length" +\
                 " of $blade_material steel priced at [ $$" +\
                 formatting.color("$price",fg=formatting.colors.GREEN)+\
                 " ]")
