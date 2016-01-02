@@ -302,8 +302,7 @@ def query_bhq_knife(endpoint):
     item_selection= soup.findAll("span",{"class": "item-descr-price"})
     price_element = item_selection[0].find("div", {"class" : "price" }).text
     #price = parse_price_element(price_element)
-
-    if not price_element:
+    if price_element.strip() == "Sold":
         price = "Out of Stock"
     else:
         items = price_element.split(":")
