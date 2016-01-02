@@ -10,7 +10,8 @@ from urllib2 import urlopen, URLError
 import re
 
 def construct_string(search_string):
-    return search_string.replace(" ","+")
+    good_html_string = search_string.replace("/","")
+    return good_html_string.replace(" ","+")
 
 class ddg:
     def __init__(self):
@@ -25,7 +26,7 @@ class ddg:
         formatted_text = construct_string(query_text)
         query_string = "{target}q={q}".format(target=self.site, q=formatted_text)
         if site:
-            query_string += "+site%3A{site}".format(site=site)
+            query_string = "{target}q=site%3A{site}+{q}".format(target=self.site, site=site, q=formatted_text)
         if use_json:
             query_string += "&format=json"
             self.parser = self.json_parser
@@ -40,7 +41,7 @@ class ddg:
             try:
                 page = urlopen("{url}".format(url=page_url))
             except URLError as e:
-                print(e.reason)
+                print(e.reason+ " " + page_url)
             soup = bs(page)
             meta = soup.find("meta",{"name":"keywords"})
             bhq_items = meta["content"].split(",")
@@ -53,7 +54,7 @@ class ddg:
         try:
             page = urlopen(formatted_query)
         except URLError as e:
-            print(e.reason)
+            print(e.reason + " " + formatted_query)
         soup = bs(page)
         results = soup.findAll('div', {'class': re.compile('links_main*')})
         for r in results:
