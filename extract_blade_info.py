@@ -302,12 +302,13 @@ def query_bhq_knife(endpoint):
     item_selection= soup.findAll("span",{"class": "item-descr-price"})
     price_element = item_selection[0].find("div", {"class" : "price" }).text
     #price = parse_price_element(price_element)
-    items = price_element.split(":")
-    if len(items>1):
+
+    if not price_element:
+        price = "Out of Stock"
+    else:
+        items = price_element.split(":")
         price = items[1].strip()
         price = price.strip("$")
-    else:
-        price = "Out of Stock"
     
     today = datetime.date.today()
     knife["Date Added"] = today.strftime(u"%x")
