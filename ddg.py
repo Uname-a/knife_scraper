@@ -30,6 +30,20 @@ class ddg:
             query_string += "&format=json"
             self.parser = self.json_parser
         self.parser(query_string)
+    def bhq_safe_query(self, query_text, use_json=False, site=""):
+        self.query(query_text, use_json, site)
+        # check if "cat" is in the returned url
+        page_url = self.results[0]
+        if "/cat--" in page_url:
+            try:
+                page = urlopen("{url}".format(url=page_url))
+            except URLError as e:
+                print(e.reason)
+            soup = bs(page)
+            meta = soup.find("meta",{"name":"keywords"})
+            bhq_items = meta["content"].split(",")
+            self.bhq_safe_query(bhq_items[0], use_json, site)
+
     def json_parser(self):
         pass
     def soup_parser(self,formatted_query):
@@ -47,7 +61,10 @@ class ddg:
                 self.results.append(r.a['href'])
         if not r:
             print("{} not found".format(formatted_query))
-
+def safe_run():
+    d = ddg()
+    d.bhq_safe_query("griptillian", site="bladehq.com")
+    print d.results[0]
 def run():
     # Simple usage
     d = ddg()

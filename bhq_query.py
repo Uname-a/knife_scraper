@@ -13,7 +13,7 @@ from extract_blade_info import query_bhq_knife,KnifeFormatter,replaceDictKeys,BH
 def knife(bot, trigger):
     query = trigger.group(2)
     d = ddg()
-    d.query(query, site="bladehq.com")
+    d.bhq_safe_query(query, site="bladehq.com")
     #use the first result
     if not d.results:
         bot.reply("I couldn't find anything with the search term {}".format(query))
