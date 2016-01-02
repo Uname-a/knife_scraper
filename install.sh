@@ -15,4 +15,6 @@ then
 	cp extract_blade_info.py $sopel_dir
 	cp ddg.py $sopel_dir
 	cp bhq_query.py $sopel_dir
+	# remove the python object files
+	rm $sopel_dir/{extract_blade_info,ddg,bhq_query}.pyc
 fi
