@@ -33,6 +33,8 @@ class ddg:
     def bhq_safe_query(self, query_text, use_json=False, site=""):
         self.query(query_text, use_json, site)
         # check if "cat" is in the returned url
+        if not self.results:
+            return
         page_url = self.results[0]
         if "/cat--" in page_url:
             try:
