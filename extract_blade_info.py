@@ -303,8 +303,12 @@ def query_bhq_knife(endpoint):
     price_element = item_selection[0].find("div", {"class" : "price" }).text
     #price = parse_price_element(price_element)
     items = price_element.split(":")
-    price = items[1].strip()
-    price = price.strip("$")
+
+    if items:
+        price = items[1].strip()
+        price = price.strip("$")
+    else:
+        price = "Out of Stock"
     
     today = datetime.date.today()
     knife["Date Added"] = today.strftime(u"%x")
