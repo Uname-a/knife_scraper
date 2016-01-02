@@ -303,8 +303,7 @@ def query_bhq_knife(endpoint):
     price_element = item_selection[0].find("div", {"class" : "price" }).text
     #price = parse_price_element(price_element)
     items = price_element.split(":")
-
-    if items:
+    if len(items>1):
         price = items[1].strip()
         price = price.strip("$")
     else:
