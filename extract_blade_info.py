@@ -38,6 +38,7 @@ INVENTORY_ITEMS =  OrderedDict([("date_added","text"),
     ("open_type","text"),
     ("lock_type","text"),
     ("brand","text"),
+    ("url","text"),
     ("model","text"),
     ("model_number","text"),
     ("country_of_origin","text"),
@@ -68,6 +69,7 @@ BHQNAME_TO_DBNAME= dict({
     "Opener":"open_type",
     "Lock Type":"lock_type",
     "Brand":"brand",
+    "Link":"url",
     "Model":"model",
     "Model Number":"model_number",
     "Country of Origin":"country_of_origin",
@@ -177,6 +179,7 @@ class inventoryDatabase:
                 open_type text,
                 lock_type text,
                 brand text,
+                url text,
                 model text,
                 model_number text,
                 country_of_origin text,
@@ -310,6 +313,7 @@ def query_bhq_knife(endpoint):
         price = price.strip("$")
     
     today = datetime.date.today()
+    knife["Link"] = endpoint
     knife["Date Added"] = today.strftime(u"%x")
     knife["Vendor Name"] = u"BHQ"
     knife["Vendor ID"] = unicode(bhq_item_num)
@@ -353,11 +357,14 @@ class KnifeFormatter():
     # function due to the coloring
     def setupDefault(self):
         # to check the string construct 
-        fmt = Template("$model" +\
-                " $blade_lengthMKS blade length" +\
-                " of $blade_material steel priced at [ $$" +\
+        fmt = Template("The $brand $model" +\
+                " has a $blade_lengthMKS blade " +\
+                " made of $blade_material steel with " +\
+                " $handle_material handle " +\
+                " priced at [ $$" +\
                 formatting.color("$price",fg=formatting.colors.GREEN)+\
-                " ]")
+                " ] " +\
+                " $url")
         try:
             fmt.safe_substitute(**INVENTORY_ITEMS)
             return fmt
