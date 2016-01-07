@@ -20,6 +20,7 @@ class ddg:
         self.site = self.html_site 
         self.results = []# text : site 
         self.nresults = 10
+        self.last_url = ""
         # if json is used the ddg api is calledl
         self.parser = self.soup_parser
     def query(self, query_text, use_json=False, site=""):
@@ -37,7 +38,9 @@ class ddg:
         if not self.results:
             return
         page_url = self.results[0]
-        if "/cat--" in page_url:
+
+        if "/cat--" in page_url and self.last_url != page_url:
+            self.last_url = page_url
             try:
                 page = urlopen("{url}".format(url=page_url))
             except URLError as e:
