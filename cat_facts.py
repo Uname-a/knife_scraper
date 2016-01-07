@@ -7,8 +7,9 @@
 
 from sopel import  *
 from random import randint
-@module.commands('cf')
+@module.commands('cf','catfact')
 def knife(bot, trigger):
+    """ Tell someone a wonderful fact about cats """
     f = open("/home/knifebot/.sopel/knifeclub_modules/cat_facts.txt")
     fact_list = f.readlines()
     max_fact = len(fact_list)
