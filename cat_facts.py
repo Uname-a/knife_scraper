@@ -13,5 +13,5 @@ def knife(bot, trigger):
     f = open("/home/knifebot/.sopel/knifeclub_modules/cat_facts.txt")
     fact_list = f.readlines()
     max_fact = len(fact_list)
-    fact_num = randint(0,max_fact)
+    fact_num = randint(0,max_fact-1)
     bot.say('{}'.format(fact_list[fact_num].strip()))
