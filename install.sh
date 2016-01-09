@@ -2,7 +2,7 @@
 # Copies python files into sopel modules directory... pretty horrible actually
 # install.sh - shell script to copy files to sopel runtime directory
 # 
-# Copyright (c) 2015 Casey Bartlett <caseytb@bu.edu>
+# Copyright (c) 2015,2016 Casey Bartlett <caseytb@bu.edu>
 # 
 # See LICENSE for terms of usage, modification and redistribution.
 

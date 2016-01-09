@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# ddg.py - Library for querying DuckDuckGo.com
+# ddg.py - Library for querying from DuckDuckGo.com
 # 
-# Copyright (c) 2015 Casey Bartlett <caseytb@bu.edu>
+# Copyright (c) 2015,2016 Casey Bartlett <caseytb@bu.edu>
 # 
 # See LICENSE for terms of usage, modification and redistribution.
 
@@ -16,12 +16,13 @@ def construct_string(search_string):
 class ddg:
     def __init__(self):
         self.html_site = 'http://duckduckgo.com/html/?'
-        self.java_site = 'http://duckduckgo.com/?' # doesn't really work..
+        self.java_site = 'http://duckduckgo.com/?' # without html use json - but page uses js
         self.site = self.html_site 
         self.results = []# text : site 
-        self.nresults = 10
+        self.depth_limit = 3
+        self.current_depth = 0
         self.last_url = ""
-        # if json is used the ddg api is calledl
+        # if json is used the ddg api is called
         self.parser = self.soup_parser
     def query(self, query_text, use_json=False, site=""):
         formatted_text = construct_string(query_text)
@@ -40,15 +41,18 @@ class ddg:
         page_url = self.results[0]
 
         if "/cat--" in page_url and self.last_url != page_url:
-            self.last_url = page_url
-            try:
-                page = urlopen("{url}".format(url=page_url))
-            except URLError as e:
-                print(e.reason+ " " + page_url)
-            soup = bs(page)
-            meta = soup.find("meta",{"name":"keywords"})
-            bhq_items = meta["content"].split(",")
-            self.bhq_safe_query(bhq_items[0], use_json, site)
+            if self.current_depth < self.depth_limit:
+                self.last_url = page_url
+                try:
+                    page = urlopen("{url}".format(url=page_url))
+                except URLError as e:
+                    print(e.reason+ " " + page_url)
+                soup = bs(page)
+                meta = soup.find("meta",{"name":"keywords"})
+                bhq_items = meta["content"].split(",")
+                self.bhq_safe_query(bhq_items[0], use_json, site)
+            else:
+                self.results = []
 
     def json_parser(self):
         pass
