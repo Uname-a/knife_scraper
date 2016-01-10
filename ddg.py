@@ -7,11 +7,26 @@
 
 from bs4 import BeautifulSoup as bs
 from urllib2 import urlopen, URLError
+from difflib import SequenceMatcher
 import re
 
 def construct_string(search_string):
     good_html_string = search_string.replace("/","")
     return good_html_string.replace(" ","+")
+
+def get_best_match(candidates, query_string):
+    max_score = 0
+    best_candidate = ""
+    for c in candidates:
+        s = SequenceMatcher(None, query_string, c )
+        score = s.ratio()
+        if score > max_score:
+            max_score = score
+            best_candidate = c
+    if best_candidate:
+        return best_candidate
+    else:
+        return candidates[0]
 
 class ddg:
     def __init__(self):
@@ -19,7 +34,7 @@ class ddg:
         self.java_site = 'http://duckduckgo.com/?' # without html use json - but page uses js
         self.site = self.html_site 
         self.results = []# text : site 
-        self.depth_limit = 3
+        self.depth_limit = 1
         self.current_depth = 0
         self.last_url = ""
         # if json is used the ddg api is called
@@ -50,7 +65,9 @@ class ddg:
                 soup = bs(page)
                 meta = soup.find("meta",{"name":"keywords"})
                 bhq_items = meta["content"].split(",")
-                self.bhq_safe_query(bhq_items[0], use_json, site)
+                best_bhq_match = get_best_match(bhq_items,query_text)
+                self.current_depth+=1
+                self.bhq_safe_query(best_bhq_match, use_json, site)
             else:
                 self.results = []
 
