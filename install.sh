@@ -18,9 +18,9 @@ then
 	cp bhq_inventory_items.py $sopel_dir
 	cp bhq_inventory_database.py $sopel_dir
 	cp cat_facts.py $sopel_dir
-	cp todays_carry.py $sopel_dir
+	cp todays_blade.py $sopel_dir
 	cp cat_facts.txt $sopel_dir
 	# remove the python object files
 	rm $sopel_dir/{extract_blade_info,ddg,bhq_query,cat_facts,bhq_inventory_database,bhq_inventory_items}.pyc
-	rm $sopel_dir/{todays_carry}.pyc
+	rm $sopel_dir/{todays_blade}.pyc
 fi
