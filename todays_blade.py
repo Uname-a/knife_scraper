@@ -18,8 +18,8 @@ def carry(bot, trigger):
         target_nick = qnick.strip()
         carry_url = bot.db.get_nick_value(target_nick, 'todayscarry')
         if not carry_url:
-            return bot.msg(trigger.sender, "I don't know what {nickname} is carrying. ".format(target_nick) +
-                    "{nickname}: tell my what you're carrying like, .setcarry imgur.com".format(target_nick))
+            return bot.msg(trigger.sender, "I don't know what {nickname} is carrying. ".format(nickname=target_nick) +
+                    "{nickname}: tell my what you're carrying like, .setcarry imgur.com".format(nickname=target_nick))
 
     bot.say("{nick} is currently carrying {url}".format(nick=target_nick, url=carry_url))
 
@@ -35,5 +35,5 @@ def update_carry(bot, trigger):
     if not body:
         return bot.reply("Invalid url")
     bot.db.set_nick_value(trigger.nick, 'todayscarry', trigger.group(2))
-    bot.reply("I have your carry set as {url}".format(trigger.group(2)))
+    bot.reply("I have your carry set as {url}".format(url=trigger.group(2)))
 
