@@ -29,7 +29,7 @@ def random_chars(s):
 
 @module.commands('a10')
 @module.rule('a10')
-@module.rule('a-10')
+@module.rule('a\-10')
 @module.rule('/.*[Bb]+[Rr]+[Tt]+.*/')
 def knife(bot, trigger):
         bot.say(random_chars('bbrrrrtt!'))
