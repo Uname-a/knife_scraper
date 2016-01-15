@@ -9,15 +9,27 @@ from sopel import  *
 import random
 from itertools import repeat, imap
 
-def rand_cap(c):
+def random_cap(c):
+   temp = random.randint(0,2)
+   if temp == 0:
+        c = formatting.color(c,fg=formatting.colors.RED)
+   elif  temp == 1:
+        c = formatting.color(c,fg=formatting.colors.BLUE)
+   elif temp == 2:
+        c = formatting.color(c,fg=formatting.colors.WHITE)
    if random.randint(0, 1):
        return c.upper()
    return c.lower()
+
+def random_chars(s):
+   new_s = []
+   for c in s:
+       new_s.extend(imap(random_cap, repeat(c, random.randint(1, 10))))
+   return ''.join(new_s)
 
 @module.commands('a10')
 @module.rule('(a).*(10)')
 @module.rule('/.*[Bb]+[Rr]+[Tt]+.*/')
 def knife(bot, trigger):
-   bot.say(formatting.color("bbb"*random.randint(1,3),fg=formatting.colors.RED) +\
-      formatting.color(rand_cap("r")*random.randint(10,24),fg=formatting.colors.WHITE) +\
-      formatting.color("t"*random.randint(4,15),fg=formatting.colors.BLUE))
+        bot.say(random_chars('bbrrrrtt!'))
+
