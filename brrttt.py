@@ -28,7 +28,8 @@ def random_chars(s):
    return ''.join(new_s)
 
 @module.commands('a10')
-@module.rule('[^a-zA-Z0-9]*[aA](-)?(10)[^a-zA-Z0-9]*')
+@module.rule('a10')
+@module.rule('a-10')
 @module.rule('/.*[Bb]+[Rr]+[Tt]+.*/')
 def knife(bot, trigger):
         bot.say(random_chars('bbrrrrtt!'))
