@@ -16,7 +16,7 @@ def rand_cap(c):
 
 @module.commands('a10')
 @module.rule('(a).*(10)')
-@module.rule('.*[Bb]+[Rr]+[Tt]+.*')
+@module.rule('/.*[Bb]+[Rr]+[Tt]+.*/')
 def knife(bot, trigger):
    bot.say(formatting.color("bbb"*random.randint(1,3),fg=formatting.colors.RED) +\
       formatting.color(rand_cap("r")*random.randint(10,24),fg=formatting.colors.WHITE) +\
