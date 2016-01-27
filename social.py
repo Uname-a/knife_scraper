@@ -1,8 +1,7 @@
 # coding=utf8
 """Reddit and Instagram module for Sopel"""
-from sopel import module, url
-import random
-from itertools import repeat, imap
+from sopel import module 
+from sopel.modules import url
 
 @module.rule('(?<!\w)r[/\s](\w+)')
 def subreddit(bot, trigger): 
