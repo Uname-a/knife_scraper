@@ -11,6 +11,7 @@ from collections import OrderedDict
 from sopel import formatting
 from string import Template
 from bhq_inventory_items import INVENTORY_ITEMS, BHQNAME_TO_DBNAME 
+from kc_inventory_items import INVENTORY_ITEMS as KC_ITEMS, KCNAME_TO_DBNAME 
 import exceptions
 import datetime
 
@@ -71,6 +72,69 @@ def parse_price_element(price_element):
     price_no_symbol = price_no_symbol.replace(",","")
     dollars, cents =price_no_symbol.split(".")
     return PriceQuantity(dollars,cents)
+
+def parse_unit(the_text):
+    return the_text
+def parse_text(the_text):
+    return the_text
+def spec_parse_rules( key ):
+    parse_rules =  {
+        "Overall Length" : parse_unit,
+        "Blade Length" : parse_unit,
+        "Closed Length" : parse_unit,
+        "Cutting Edge Length" : parse_unit,
+        "Steel" : parse_text,
+        "Handle Material" : parse_text,
+        "Weight" : parse_unit,
+        "Clip" : parse_text,
+        "Tip Carry" : parse_text
+    }
+    # assume parse_text otherwise
+    return parse_rules.get(key,parse_text)
+
+def spec_items_to_dict(spec_items):
+    spec_dict= dict()
+    for s in spec_items:
+        ss = s.text.split(":")
+        # means we have two items
+        if len(ss) == 2:
+            key = ss[0].strip()
+            value = ss[1].strip()
+            parser = spec_parse_rules(key)
+            spec_dict[key] = parser(value)
+        elif s.text == "Made in USA":
+            spec_dict["Country of Origin"] = "USA"
+        else:
+            print("Not sure what to do here")
+    return spec_dict
+
+def query_kc_knife(endpoint):
+    try:
+        page = urlopen("{url}".format(url=endpoint))
+    except URLError as e:
+        print(e.reason)
+    soup = bs(page)
+    price = soup.find("span",{"itemprop":"price"}).text
+    description = soup.find("div", {"class":"description"})
+    major_item_details = description.findAll("b")
+    model = major_item_details[1].text
+    brand = description.find("i").text
+
+    all_specs = soup.find("div",{"class":'specs'})
+    spec_items = all_specs.findAll("li")
+    spec_dict = spec_items_to_dict(spec_items)
+    knife = OrderedDict()
+    knife.update(spec_dict)
+
+    today = datetime.date.today()
+    knife["Link"] = endpoint
+    knife["Brand"] = brand
+    knife["Model"] = model
+    knife["Date Added"] = today.strftime(u"%x")
+    knife["Vendor Name"] = u"Knife Center"
+    knife["Vendor ID"] = soup.find("td",{"class":'sku'}).text
+    knife["Price"] = price
+    return knife
 
 def query_bhq_knife(endpoint):
     try:
