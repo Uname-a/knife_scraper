@@ -26,3 +26,4 @@ def urlmessage(bot, trigger, url)
     results = url.process_urls(bot, trigger, url)
     for title in results[:4]:
         message = url + '[ %s ]' % (title)
+    return message
