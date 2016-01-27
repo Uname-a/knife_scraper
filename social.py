@@ -7,20 +7,20 @@ from sopel.modules import url
 def subreddit(bot, trigger): 
     url = 'http://www.reddit.com/r/' + trigger.group(1)
     message = urlmessage(bot, trigger, url)
-    bot.say(message)
+    bot.say(url)
 
 
 @module.rule('(?<!\w)u[/\s](\w+)')
 def reddituser(bot, trigger): 
     url = 'http://www.reddit.com/u/' + trigger.group(1)
     message = urlmessage(bot, trigger, url)
-    bot.say(message)
+    bot.say(url)
 
 @module.rule('(?<!\w)W@(\w+)')
 def instagram(bot, trigger): 
     url = 'http://www.instagram.com' + trigger.group(1)
     message = urlmessage(bot, trigger, url)
-    bot.say(message)
+    bot.say(url)
 
 def urlmessage(bot, trigger, url)
     results = url.process_urls(bot, trigger, url)
