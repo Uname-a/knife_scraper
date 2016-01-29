@@ -1,7 +1,7 @@
 # coding=utf8
 """Reddit and Instagram module for Sopel"""
 from sopel import module 
-from sopel.modules import url
+from sopel.modules import url, reddit
 
 @module.rule('.*\W[/\s]r/(\w+)')
 @module.rule('^/?r/(\w+)')
@@ -14,9 +14,8 @@ def subreddit(bot, trigger):
 @module.rule('.*\W[/\s]u/(\w+)')
 @module.rule('^/?u/(\w+)')
 def reddituser(bot, trigger): 
-    _url = 'http://www.reddit.com/u/' + trigger.group(1)
-    message = urlmessage(bot, trigger, _url)
-    bot.say(message)
+    reddit.redditor_info(bot,trigger.group(1))
+
 
 @module.rule('.*\W@(\w+)')
 @module.rule('^@(\w+)')
