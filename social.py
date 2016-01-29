@@ -3,16 +3,16 @@
 from sopel import module 
 from sopel.modules import url
 
-@module.rule('.*\Wr[/\s](\w+)')
-@module.rule('^r[/\s](\w+)')
+@module.rule('.*[/\s]r/(\w+)')
+@module.rule('^/?r/(\w+)')
 def subreddit(bot, trigger): 
     _url = 'http://www.reddit.com/r/' + trigger.group(1)
 #    message = urlmessage(bot, trigger, url)
     bot.say(_url)
 
 
-@module.rule('.*\Wu[/\s](\w+)')
-@module.rule('^u[/\s](\w+)')
+@module.rule('.*[/\s]u/(\w+)')
+@module.rule('^/?u/(\w+)')
 def reddituser(bot, trigger): 
     _url = 'http://www.reddit.com/u/' + trigger.group(1)
 #    message = urlmessage(bot, trigger, url)
