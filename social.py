@@ -21,7 +21,7 @@ def reddituser(bot, trigger):
 @module.rule('.*\W@(\w+)')
 @module.rule('^@(\w+)')
 def instagram(bot, trigger): 
-    _url = 'http://www.instagram.com' + trigger.group(1)
+    _url = 'http://www.instagram.com/' + trigger.group(1)
 #    message = urlmessage(bot, trigger, url)
     bot.say(_url)
 
