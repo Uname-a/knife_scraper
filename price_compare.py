@@ -27,6 +27,7 @@ def knife(bot, trigger):
     """
     query = trigger.group(2)
     d = ddg()
+<<<<<<< HEAD
     sites = [ query_attributes("knifecenter.com",
                 query_kc_knife,
                 KCNAME_TO_DBNAME),
