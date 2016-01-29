@@ -7,7 +7,7 @@ from sopel.modules import url
 @module.rule('^/?r/(\w+)')
 def subreddit(bot, trigger): 
     _url = 'http://www.reddit.com/r/' + trigger.group(1)
-#    message = urlmessage(bot, trigger, url)
+    message = urlmessage(bot, trigger, url)
     bot.say(_url)
 
 
@@ -15,14 +15,14 @@ def subreddit(bot, trigger):
 @module.rule('^/?u/(\w+)')
 def reddituser(bot, trigger): 
     _url = 'http://www.reddit.com/u/' + trigger.group(1)
-#    message = urlmessage(bot, trigger, url)
+    message = urlmessage(bot, trigger, url)
     bot.say(_url)
 
 @module.rule('.*\W@(\w+)')
 @module.rule('^@(\w+)')
 def instagram(bot, trigger): 
     _url = 'http://www.instagram.com/' + trigger.group(1)
-#    message = urlmessage(bot, trigger, url)
+    message = urlmessage(bot, trigger, url)
     bot.say(_url)
 
 def urlmessage(bot, trigger, url):
