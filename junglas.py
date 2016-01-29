@@ -19,6 +19,7 @@ def random_chars(s):
 #print random_chars('hoonglass')
 
 
-@module.rule('.*((j+u+)|(h+oo+))n+g+l+a+s+')
+@module.rule('.*\W((j+u+)|(h+oo+))n+g+l+a+s+')
+@module.rule('^((j+u+)|(h+oo+))n+g+l+a+s+')
 def junglas(bot, trigger): 
     bot.say(random_chars('hoonglass!'))
