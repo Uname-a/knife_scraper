@@ -7,13 +7,16 @@
 
 from sopel import  *
 from ddg import ddg
-from extract_blade_info import query_kc_knife, KnifeFormatter, replaceDictKeys, BHQNAME_TO_DBNAME
+from extract_blade_info import query_kc_knife, KnifeFormatter, replaceDictKeys
 
-@module.commands('knife')
+@module.commands('kcknife')
 def knife(bot, trigger):
+    """
+    Queries a knife center knife
+    """
     query = trigger.group(2)
     d = ddg()
-    d.query(query, site="knife_center.com")
+    d.query(query, site="knifecenter.com")
     #use the first result
     if not d.results:
         bot.reply("I couldn't find anything with the search term {}".format(query))

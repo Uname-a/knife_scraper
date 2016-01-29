@@ -11,7 +11,6 @@ from collections import OrderedDict
 from sopel import formatting
 from string import Template
 from bhq_inventory_items import INVENTORY_ITEMS, BHQNAME_TO_DBNAME 
-from kc_inventory_items import INVENTORY_ITEMS as KC_ITEMS, KCNAME_TO_DBNAME 
 import exceptions
 import datetime
 

@@ -3,26 +3,26 @@
 from sopel import module 
 from sopel.modules import url
 
-@module.rule('(?<!\w)r[/\s](\w+)')
+@module.rule('.* r[/ ](\w).*')
 def subreddit(bot, trigger): 
-    url = 'http://www.reddit.com/r/' + trigger.group(1)
+    _url = 'http://www.reddit.com/r/' + trigger.group(1)
 #    message = urlmessage(bot, trigger, url)
-    bot.say(url)
+    bot.say(_url)
 
 
 @module.rule('(?<!\w)u[/\s](\w+)')
 def reddituser(bot, trigger): 
-    url = 'http://www.reddit.com/u/' + trigger.group(1)
+    _url = 'http://www.reddit.com/u/' + trigger.group(1)
 #    message = urlmessage(bot, trigger, url)
-    bot.say(url)
+    bot.say(_url)
 
 @module.rule('(?<!\w)W@(\w+)')
 def instagram(bot, trigger): 
-    url = 'http://www.instagram.com' + trigger.group(1)
+    _url = 'http://www.instagram.com' + trigger.group(1)
 #    message = urlmessage(bot, trigger, url)
-    bot.say(url)
+    bot.say(_url)
 
-def urlmessage(bot, trigger, url)
+def urlmessage(bot, trigger, url):
     results = url.process_urls(bot, trigger, url)
     for title in results[:4]:
         message = url + '[ %s ]' % (title)
