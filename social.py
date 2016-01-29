@@ -29,5 +29,5 @@ def urlmessage(bot, trigger, _url):
     results = url.process_urls(bot, trigger, [_url])
     message = _url
     for title, domain in results:
-        message += ' [ {} ]'.format(title)
+        message += ' [ ' + title + ' ]'
     return message
