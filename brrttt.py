@@ -28,10 +28,14 @@ def random_chars(s):
    return ''.join(new_s)
 
 @module.commands('a10')
-@module.rule('.*\s[aA](\-)?10\W*')
-@module.rule('^[aA](\-)?10\W*')
-@module.rule('.*\s[Bb]+[Rr]+[Tt]+\W*')
-@module.rule('^[Bb]+[Rr]+[Tt]+\W*')
+@module.rule('.*\W[aA](\-)?10\W')
+@module.rule('.*\W[aA](\-)?10$')
+@module.rule('^[aA](\-)?10\W')
+@module.rule('^[aA](\-)?10$')
+@module.rule('.*\W[Bb]+[Rr]+[Tt]+\W')
+@module.rule('.*\W[Bb]+[Rr]+[Tt]+$')
+@module.rule('^[Bb]+[Rr]+[Tt]+\W')
+@module.rule('^[Bb]+[Rr]+[Tt]+$')
 def knife(bot, trigger):
         bot.say(random_chars('bbrrrrtt!'))
 
