@@ -25,8 +25,8 @@ def instagram(bot, trigger):
     message = urlmessage(bot, trigger, _url)
     bot.say(_url)
 
-def urlmessage(bot, trigger, url):
-    results = url.process_urls(bot, trigger, url)
+def urlmessage(bot, trigger, _url):
+    results = url.process_urls(bot, trigger, _url)
     for title in results[:4]:
         message = url + '[ %s ]' % (title)
     return message
