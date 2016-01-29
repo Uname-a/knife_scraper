@@ -10,6 +10,7 @@ from sopel import *
 from ddg import ddg
 from extract_blade_info import query_kc_knife, query_bhq_knife, replaceDictKeys
 from kc_inventory_items import KCNAME_TO_DBNAME
+from bhq_inventory_items import BHQNAME_TO_DBNAME
 
 
 class query_attributes:
@@ -34,7 +35,7 @@ def knife(bot, trigger):
                 KCNAME_TO_DBNAME),
               query_attributes("bladehq.com",
                 query_bhq_knife,
-                KCNAME_TO_DBNAME)]
+                BHQNAME_TO_DBNAME)]
     for qa in sites:
         s = qa.site
         d.query(query, site=s)
