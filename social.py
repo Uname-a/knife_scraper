@@ -8,7 +8,7 @@ from sopel.modules import url
 def subreddit(bot, trigger): 
     _url = 'http://www.reddit.com/r/' + trigger.group(1)
     message = urlmessage(bot, trigger, _url)
-    bot.say(_url)
+    bot.say(message)
 
 
 @module.rule('.*[/\s]u/(\w+)')
@@ -16,14 +16,14 @@ def subreddit(bot, trigger):
 def reddituser(bot, trigger): 
     _url = 'http://www.reddit.com/u/' + trigger.group(1)
     message = urlmessage(bot, trigger, _url)
-    bot.say(_url)
+    bot.say(message)
 
 @module.rule('.*\W@(\w+)')
 @module.rule('^@(\w+)')
 def instagram(bot, trigger): 
     _url = 'http://www.instagram.com/' + trigger.group(1)
     message = urlmessage(bot, trigger, _url)
-    bot.say(_url)
+    bot.say(message)
 
 def urlmessage(bot, trigger, _url):
     results = url.process_urls(bot, trigger, [_url])
