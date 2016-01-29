@@ -10,7 +10,7 @@ from __future__ import unicode_literals, absolute_import, print_function, divisi
 import sopel.loader
 import sopel.module
 import subprocess
-from sopel.reload import f_reload
+from sopel.modules.reload import f_reload
 from se_config import install_directory
 
 
