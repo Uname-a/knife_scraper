@@ -3,20 +3,23 @@
 from sopel import module 
 from sopel.modules import url
 
-@module.rule('.* r[/ ](\w).*')
+@module.rule('\Wr[/\s](\w+)')
+@module.rule('^r[/\s](\w+)')
 def subreddit(bot, trigger): 
     _url = 'http://www.reddit.com/r/' + trigger.group(1)
 #    message = urlmessage(bot, trigger, url)
     bot.say(_url)
 
 
-@module.rule('(?<!\w)u[/\s](\w+)')
+@module.rule('\Wu[/\s](\w+)')
+@module.rule('^u[/\s](\w+)')
 def reddituser(bot, trigger): 
     _url = 'http://www.reddit.com/u/' + trigger.group(1)
 #    message = urlmessage(bot, trigger, url)
     bot.say(_url)
 
-@module.rule('(?<!\w)W@(\w+)')
+@module.rule('\W@(\w+)')
+@module.rule('^@(\w+)')
 def instagram(bot, trigger): 
     _url = 'http://www.instagram.com' + trigger.group(1)
 #    message = urlmessage(bot, trigger, url)
