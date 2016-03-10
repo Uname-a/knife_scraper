@@ -6,6 +6,8 @@
 # See LICENSE for terms of usage, modification and redistribution.
 from sopel import web
 from sopel.module import commands, example, NOLIMIT
+from collections import OrderedDict as od
+import time
 
 
 def format_links(inventory_items):
@@ -21,15 +23,15 @@ def inventory(bot, trigger):
     qnick = trigger.group(2)
     target_nick = ""
     if not qnick:
-        carry_url = bot.db.get_nick_value(trigger.nick, 'blade_inventory')
-        if not carry_url:
+        inventory = bot.db.get_nick_value(trigger.nick, 'blade_inventory')
+        if not inventory:
             return bot.msg(trigger.sender, "I don't have an inventory for you. " +
                     "Tell my what you're carrying like, .setinventory imgur.com/link1 imgur.com/link2")
         target_nick = trigger.nick
     else:
         target_nick = qnick.strip()
         inventory = bot.db.get_nick_value(target_nick, 'blade_inventory')
-        if not carry_url:
+        if not inventory:
             return bot.msg(trigger.sender, "{nickname} hasn't set an inventory. ".format(nickname=target_nick) +
                     "{nickname}: you can provide an inventory of your knives like, \".inventory imgur.com/link1 imgur.com/link2\"".format(nickname=target_nick))
 
@@ -48,10 +50,16 @@ def update_inventory(bot, trigger):
         return NOLIMIT
     inventory_links = stripped_inventory
     response = ""
+
+    # remove duplicate links
+    inventory_links = list(od.fromkeys(inventory_links))
     for link in inventory_links:
         body = web.get(link)
         if not body:
             response +="Invalid url \"{}\". ".format(link)
+        # Sleep for 300 ms
+        # otherwise we hit the endpoint too much
+        time.sleep(0.3)
     if response:
         bot.reply(response)
         return NOLIMIT
@@ -72,3 +80,4 @@ def update_carry(bot, trigger):
     selected_carry = inventory[int(index)]
     bot.db.set_nick_value(trigger.nick, 'todayscarry', selected_carry)
     bot.reply("I have your carry set as {url} from index {idx}".format(url=trigger.group(2), idx=index))
+
