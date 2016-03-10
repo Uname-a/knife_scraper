@@ -48,7 +48,7 @@ def update_inventory(bot, trigger):
     else: 
         bot.reply('Give me a space delimited list of imgur url')
         return NOLIMIT
-    inventory_links = stripped_inventory
+    inventory_links = stripped_inventory.split(" ")
     response = ""
 
     # remove duplicate links
