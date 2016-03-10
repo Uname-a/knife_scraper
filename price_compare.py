@@ -49,8 +49,8 @@ def knife(bot, trigger):
         if qa.url:
             knife = qa.fcn(qa.url)
             d = replaceDictKeys(qa.DBC, knife)
-            qa.price = d["Price"]
-            comp_string += "[{site}:{price}] ".format(site=d.site, price=qa.price)
+            qa.price = knife["Price"]
+            comp_string += "[{site}:{price}] ".format(site=qa.site, price=qa.price)
 
     if(comp_string):
         bot.say(comp_string)

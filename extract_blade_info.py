@@ -20,6 +20,7 @@ def replaceDictKeys(key_map, dict_to_change):
         if k in dict_to_change:
             d[v] = dict_to_change[k]
     return d
+
 def getSubDict(keys, theDict):
     d = dict()
     for k in keys:
