@@ -53,13 +53,15 @@ def update_inventory(bot, trigger):
 
     # remove duplicate links
     inventory_links = list(od.fromkeys(inventory_links))
-    for link in inventory_links:
-        body = web.get(link)
-        if not body:
-            response +="Invalid url \"{}\". ".format(link)
-        # Sleep for 300 ms
-        # otherwise we hit the endpoint too much
-        time.sleep(0.3)
+    #TODO the link lookup thing is broken because imgur
+    if not True:
+        for link in inventory_links:
+            body = web.get(link)
+            if not body:
+                response +="Invalid url \"{}\". ".format(link)
+            # Sleep for 300 ms
+            # otherwise we hit the endpoint too much
+            time.sleep(0.3)
     if response:
         bot.reply(response)
         return NOLIMIT
