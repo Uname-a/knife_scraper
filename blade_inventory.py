@@ -48,7 +48,7 @@ def update_inventory(bot, trigger):
     else: 
         bot.reply('Give me a space delimited list of imgur url')
         return NOLIMIT
-    inventory_links = stripped_inventory.split(" ")
+    inventory_links = stripped_inventory.split()
     response = ""
 
     # remove duplicate links
@@ -81,5 +81,5 @@ def update_carry(bot, trigger):
                 "Tell my what you're carrying like, .setinventory imgur.com/link1 imgur.com/link2")
     selected_carry = inventory[int(index)]
     bot.db.set_nick_value(trigger.nick, 'todayscarry', selected_carry)
-    bot.reply("I have your carry set as {url} from index {idx}".format(url=trigger.group(2), idx=index))
+    bot.reply("I have your carry set as {url} from index {idx}".format(url=selected_carry, idx=index))
 
