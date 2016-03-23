@@ -24,17 +24,16 @@ def carry(bot, trigger):
     bot.say("{nick} is currently carrying {url}".format(nick=target_nick, url=carry_url))
 
 @commands('setcarry', 'sc')
-@example('.tc http://imgur.com')
+@example('.sc http://imgur.com')
 def update_carry(bot, trigger):
     """Set the knife you're carrying today."""
-    inventory_links = trigger.group(2)
-    if not inventory_links:
+    selection = trigger.group(2)
+    if not selection:
         bot.reply('Give me a list of imgur urls')
         return NOLIMIT
-    for link in inventory_links:
-        body = web.get(link)
-        if not body:
-            return bot.reply("Invalid url {}".format(link))
+    body = web.get(selection)
+    if not body:
+        return bot.reply("Invalid url {}".format(selection))
     bot.db.set_nick_value(trigger.nick, 'todayscarry', trigger.group(2))
     bot.reply("I have your carry set as {url}".format(url=trigger.group(2)))
 
