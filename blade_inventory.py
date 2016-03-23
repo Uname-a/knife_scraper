@@ -33,7 +33,7 @@ def inventory(bot, trigger):
         inventory = bot.db.get_nick_value(target_nick, 'blade_inventory')
         if not inventory:
             return bot.msg(trigger.sender, "{nickname} hasn't set an inventory. ".format(nickname=target_nick) +
-                    "{nickname}: you can provide an inventory of your knives like, \".inventory imgur.com/link1 imgur.com/link2\"".format(nickname=target_nick))
+                    "{nickname}: you can provide an inventory of your knives like, \".setinventory imgur.com/link1 imgur.com/link2\"".format(nickname=target_nick))
 
     links = format_links(inventory)
     bot.say("{nick}'s inventory is: {urls}".format(nick=target_nick, urls=links))
@@ -70,7 +70,7 @@ def update_inventory(bot, trigger):
     bot.reply("your inventory has been set to {urls}".format(urls=links))
 
 @commands('carryfrominv', 'cfi')
-@example('.cfi 1')
+@example('.cfi 0')
 def update_carry(bot, trigger):
     index = trigger.group(2)
     if not index:
