@@ -103,7 +103,7 @@ def add_item(bot, trigger):
 @commands('remove_blade', 'rmb')
 @example('.remove_blade 2','.remove_blade imgur.com')
 def del_item(bot, trigger):
-    index_or_html = trigger.group(2).strip()
+    index_or_html = trigger.group(2)
     inventory = bot.db.get_nick_value(trigger.nick, 'blade_inventory')
     if not inventory:
         return bot.msg(trigger.sender, "I don't have an inventory for you. " +
@@ -111,10 +111,11 @@ def del_item(bot, trigger):
     if not index_or_html:
         return bot.reply('Tell me which blade to remove by index, \".remove_blade 2\",' +
                 'or by the url \".remove_blade imgur.com/link\"')
+    index_or_html = trigger.group(2).strip()
     if index_or_html.isdigit():
         index = int(index_or_html)
         if index >  len(inventory):
-            return bot.reply('You selected index {index}, while you can only select up to {user_max} '.format(index=index, user_max=len(inventory)))
+            return bot.reply('You selected index {index}, while you can only select up to {user_max} '.format(index=index, user_max=len(inventory)-1))
         item = inventory.pop(index)
     else:
         if index_or_html in inventory:
