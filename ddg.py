@@ -6,7 +6,7 @@
 # See LICENSE for terms of usage, modification and redistribution.
 
 from bs4 import BeautifulSoup as bs
-from urllib2 import urlopen, URLError
+from urllib.request import urlopen, URLError
 from difflib import SequenceMatcher
 import re
 
