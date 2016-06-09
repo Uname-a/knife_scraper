@@ -2,7 +2,7 @@
 """Junglas module for Sopel"""
 from sopel import module
 import random
-from itertools import repeat, imap
+from itertools import repeat
 
 def random_cap(c):
    if random.randint(0, 1):
@@ -13,7 +13,7 @@ def random_cap(c):
 def random_chars(s):
    new_s = []
    for c in s:
-       new_s.extend(imap(random_cap, repeat(c, random.randint(1, 10))))
+       new_s.extend(map(random_cap, repeat(c, random.randint(1, 10))))
    return ''.join(new_s)
 
 #print random_chars('hoonglass')

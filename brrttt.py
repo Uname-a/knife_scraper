@@ -7,7 +7,7 @@
 
 from sopel import  *
 import random
-from itertools import repeat, imap
+from itertools import repeat
 
 def random_cap(c):
    temp = random.randint(0,2)
@@ -24,7 +24,7 @@ def random_cap(c):
 def random_chars(s):
    new_s = []
    for c in s:
-       new_s.extend(imap(random_cap, repeat(c, random.randint(1, 10))))
+       new_s.extend(map(random_cap, repeat(c, random.randint(1, 10))))
    return ''.join(new_s)
 
 @module.commands('a10')

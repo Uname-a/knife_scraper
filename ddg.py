@@ -91,12 +91,13 @@ class ddg:
 def safe_run():
     d = ddg()
     d.bhq_safe_query("griptillian", site="bladehq.com")
-    print d.results[0]
+    print(d.results[0])
+
 def run():
     # Simple usage
     d = ddg()
     d.query("Paramilitary 2", site="bladehq.com")
-    print d.results[0]
+    print(d.results[0])
 
 if __name__ == '__main__':
     run()

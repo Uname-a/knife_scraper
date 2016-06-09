@@ -200,7 +200,7 @@ def query_test_knife():
 
     item_selection= soup.findAll("span",{"class": "item-descr-price"})
     price_element = item_selection[0].find("div", {"class" : "price" }).text
-    print price_element
+    print(price_element)
     price = parse_price_element(price_element)
     
     # these attributes have to be pulled from somewhere else
@@ -248,7 +248,7 @@ class KnifeFormatter():
 
 def run():
     knife = query_test_knife()
-    print knife
+    print(knife)
 
 # Test with fixed URL (avoid DDG here)
 def test_run():
@@ -256,8 +256,8 @@ def test_run():
     query_string = "paramilitary 2"
     url= "http://www.bladehq.com/item--Spyderco-Paramilitary-2--7920"
     knife = query_bhq_knife(url)
-    print "This is the knife:"
-    print knife
+    print("This is the knife:")
+    print(knife)
     d = replaceDictKeys(BHQNAME_TO_DBNAME,knife)
     if knife:
         #ib = inventoryDatabase()
@@ -265,7 +265,7 @@ def test_run():
         kf = KnifeFormatter()
         print(kf.formattedKnife(d))
     else:
-        print "I couldn't find the information {knife} but here's the first url I could find: {url}".format(knife = query_string,url=url)
+        print("I couldn't find the information {knife} but here's the first url I could find: {url}".format(knife = query_string,url=url))
 
 if __name__ == '__main__':
     run()
