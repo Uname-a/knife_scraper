@@ -113,7 +113,7 @@ class inventoryDatabase:
         self.connection.execute("SELECT EXISTS(SELECT 1 FROM {table} WHERE {target}=\"{value}\" LIMIT 1);".format(table=self.tablename, target=key, value=id))
         cursor =self.connection.cursor()
         data = cursor.fetchall()
-        print data
+        print(data)
         return len(data) > 0
 
     def add_knife(self, knife_dict):
@@ -151,7 +151,7 @@ def run():
     #specValues = specs[0].findall('span', {"class":"attValue"})
     # Get the first table (this contains a huge list
     #knife = query_test_knife()
-    #print knife
+    #print(knife)
     #print(knife)
     ib = inventoryDatabase()
     #ib.add_knife(knife)
