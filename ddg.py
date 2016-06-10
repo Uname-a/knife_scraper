@@ -40,6 +40,8 @@ class ddg:
         # if json is used the ddg api is called
         self.parser = self.soup_parser
     def query(self, query_text, use_json=False, site=""):
+        if not query_text:
+            return
         formatted_text = construct_string(query_text)
         query_string = "{target}q={q}".format(target=self.site, q=formatted_text)
         if site:
