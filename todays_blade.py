@@ -1,5 +1,5 @@
-from sopel import web
 from sopel.module import commands, example, NOLIMIT
+from requests import get
 
 @commands('carry')
 @example('.carry fooobarrr')
@@ -31,7 +31,7 @@ def update_carry(bot, trigger):
     if not selection:
         bot.reply('Give me a list of imgur urls')
         return NOLIMIT
-    body = web.get(selection)
+    body = get(selection)
     if not body:
         return bot.reply("Invalid url {}".format(selection))
     bot.db.set_nick_value(trigger.nick, 'todayscarry', trigger.group(2))

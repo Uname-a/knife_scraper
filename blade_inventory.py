@@ -4,7 +4,7 @@
 # Copyright (c) 2016 Casey Bartlett <caseytb@bu.edu>
 # 
 # See LICENSE for terms of usage, modification and redistribution.
-from sopel import web
+from requests import get
 from sopel.module import commands, example, NOLIMIT
 from collections import OrderedDict as od
 import time
@@ -56,8 +56,12 @@ def update_inventory(bot, trigger):
     #TODO the link lookup thing is broken because imgur
     if not True:
         for link in inventory_links:
-            body = web.get(link)
-            if not body:
+            response = get(link)
+            if response.headers:
+                if not response.headers['status'] == "200 OK":
+                    response +="Invalid url \"{url}\". Returned status {status}".format(url=link,
+                            status=response.headers['status'])
+            else:
                 response +="Invalid url \"{}\". ".format(link)
             # Sleep for 300 ms
             # otherwise we hit the endpoint too much

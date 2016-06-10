@@ -178,8 +178,8 @@ def query_bhq_knife(endpoint):
     knife["Link"] = endpoint
     knife["Date Added"] = today.strftime(u"%x")
     knife["Vendor Name"] = u"BHQ"
-    knife["Vendor ID"] = unicode(bhq_item_num)
-    knife["Price"] = unicode(price) 
+    knife["Vendor ID"] = str(bhq_item_num)
+    knife["Price"] = str(price) 
     return knife
 
 def query_test_knife():
