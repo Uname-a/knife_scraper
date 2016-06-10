@@ -15,7 +15,7 @@ import datetime
 
 def replaceDictKeys(key_map, dict_to_change):
     d = dict()
-    for k,v in key_map.iteritems():
+    for k,v in key_map.items():
         if k in dict_to_change:
             d[v] = dict_to_change[k]
     return d
