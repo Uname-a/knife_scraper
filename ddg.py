@@ -8,7 +8,6 @@
 from bs4 import BeautifulSoup as bs
 from urllib.request import urlopen, URLError
 from difflib import SequenceMatcher
-import re
 
 def construct_string(search_string):
     good_html_string = search_string.replace("/","")
@@ -64,7 +63,7 @@ class ddg:
                     page = urlopen("{url}".format(url=page_url))
                 except URLError as e:
                     print(e.reason+ " " + page_url)
-                soup = bs(page)
+                soup = bs(page, "html.parser")
                 meta = soup.find("meta",{"name":"keywords"})
                 bhq_items = meta["content"].split(",")
                 best_bhq_match = get_best_match(bhq_items,query_text)
@@ -77,17 +76,30 @@ class ddg:
         pass
     def soup_parser(self,formatted_query):
         self.results = []
-        try:
-            page = urlopen(formatted_query)
-        except URLError as e:
-            print(e.reason + " " + formatted_query)
+        DEBUG=False
+        if DEBUG:
+            print("debugging")
+            try:
+                page = urlopen("file:///home/casey/src/knife_scraper/ddg_example.html")
+            except URLError as e:
+                print(e.reason + " " + formatted_query)
+        else:
+            try:
+                page = urlopen(formatted_query)
+            except URLError as e:
+                print(e.reason + " " + formatted_query)
         soup = bs(page)
-        results = soup.findAll('div', {'class': re.compile('links_main*')})
+        results = soup(attrs={'class':'result',
+            'class':'results_links',
+            'class':'results_links_deep',
+            'class':'web-result'})
         for r in results:
+            r3 = r(attrs={'class':"result__snippet"})[0]
             if (self.results):
                 break
-            if r.a:
-                self.results.append(r.a['href'])
+            if r3:
+                self.results.append(r3["href"])
+                print(self.results)
         if not r:
             print("{} not found".format(formatted_query))
 def safe_run():
