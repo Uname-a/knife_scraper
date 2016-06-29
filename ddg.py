@@ -99,7 +99,6 @@ class ddg:
                 break
             if r3:
                 self.results.append(r3["href"])
-                print(self.results)
         if not r:
             print("{} not found".format(formatted_query))
 def safe_run():
