@@ -94,11 +94,14 @@ class ddg:
             'class':'results_links_deep',
             'class':'web-result'})
         for r in results:
-            r3 = r(attrs={'class':"result__snippet"})[0]
+            class_result = r(attrs={'class':"result__snippet"})
             if (self.results):
                 break
-            if r3:
-                self.results.append(r3["href"])
+            if class_result:
+                # only one element
+                result_elem = class_result[0]
+                if result_elem:
+                    self.results.append(result_elem["href"])
         if not r:
             print("{} not found".format(formatted_query))
 def safe_run():
