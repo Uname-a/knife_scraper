@@ -7,6 +7,7 @@
 
 from bs4 import BeautifulSoup as bs
 from urllib.request import urlopen, URLError
+from urllib.parse import unquote
 from difflib import SequenceMatcher
 
 def construct_string(search_string):
@@ -86,22 +87,28 @@ class ddg:
         else:
             try:
                 page = urlopen(formatted_query)
+                soup = bs(page)
+                results = soup(attrs={'class':'result',
+                    'class':'results_links',
+                    'class':'results_links_deep',
+                    'class':'web-result'})
+                for r in results:
+                    class_result = r(attrs={'class':"result__snippet"})
+                    if (self.results):
+                        break
+                    if class_result:
+                        # only one element
+                        result_elem = class_result[0]
+                        if result_elem:
+                            # filer response:
+                            unfil = result_elem["href"]
+                            start_string = "/l/?kh=-1&uddg=" 
+                            start_string2 = "/l/?kh=-1&amp;uddg="
+                            m = unfil.replace(start_string,'')
+                            m = m.replace(start_string2,'')
+                            self.results.append(unquote(m))
             except URLError as e:
                 print(e.reason + " " + formatted_query)
-        soup = bs(page)
-        results = soup(attrs={'class':'result',
-            'class':'results_links',
-            'class':'results_links_deep',
-            'class':'web-result'})
-        for r in results:
-            class_result = r(attrs={'class':"result__snippet"})
-            if (self.results):
-                break
-            if class_result:
-                # only one element
-                result_elem = class_result[0]
-                if result_elem:
-                    self.results.append(result_elem["href"])
         if not r:
             print("{} not found".format(formatted_query))
 def safe_run():

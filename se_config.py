@@ -7,5 +7,5 @@
 
 from os.path import  join
 
-home = "/home/knifebot"
-install_directory = join(home,"current_bot/knife_scraper")
+home = "/home/botuser"
+install_directory = join(home,"irc_bot/knife_scraper")
