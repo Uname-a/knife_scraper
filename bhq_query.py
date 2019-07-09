@@ -12,6 +12,9 @@ from extract_blade_info import query_bhq_knife,KnifeFormatter,replaceDictKeys,BH
 @module.commands('knife')
 def knife(bot, trigger):
     query = trigger.group(2)
+    if query == 'vero':
+        bot.reply('For more information on Vero knives see https://veroengineering.com/')
+        return
     d = ddg()
     d.bhq_safe_query(query, site="bladehq.com")
     #use the first result
