@@ -7,6 +7,7 @@
 
 from sopel.module import commands, example, NOLIMIT
 from sopel.tools import Identifier
+import datetime
 import random
 
 # Each user has the following associated state information (<<key: default>>)
@@ -26,14 +27,14 @@ xlMap = {0:10,
 	3:316,
 	4:1000}
 
-fightStrings = [ "Bam boom pow! {source} stabs {target} for {damage} damage!",
- "Krakow! {source} filets {target} for {damage} damage!",
- "Reeee {source} uses loud screech on {target} dealing {damage} damage!",
- "Kaboom! {source} uses their dlc for SD to stab {target} for {damage} damage!"]
+#fightStrings = [ "Bam boom pow! {source} stabs {target} for {damage} damage!",
+# "Krakow! {source} filets {target} for {damage} damage!",
+# "Reeee {source} uses loud screech on {target} dealing {damage} damage!",
+# "Kaboom! {source} uses their dlc for SD to stab {target} for {damage} damage!"]
 
-MissStrings = [ "Oh no {source} misses {target} and deals no damage"]
+MissStrings = [ "Oh no {source} misses {target} and deals no damage and cannot attack for {delay} mins"]
 
-CritMissStrings = [ "Oh no {source} is confused and attacked themself for {damage} damage!"]
+CritMissStrings = [ "Oh no {source} is confused and attacked themself for {damage} damage! and cannot attack for {delay} mins"]
 
 
 class fighter:
@@ -41,6 +42,7 @@ class fighter:
 		self.db = db
 		self.nick = nick
 		self.xl = db.get_nick_value(nick, "xl")
+		self.delay = datetime.datetime.now()
 		if not self.xl:
 			self.xl = 0
 			db.set_nick_value(nick, "xl", self.xl)
@@ -52,11 +54,14 @@ class fighter:
 		if not self.hitPoints:
 			self.hitPoints=100
 			db.set_nick_value(nick, "hitPoints", self.hitPoints)
+		if not self.delay:
+			self.delay = datetime.datetime.now()
+			db.set_nick_value(nick, "time", self.delay)
 	def receiveDamage(self, damage):
 		msg = ""
 		if self.hitPoints < damage:
 			msg = " {nick} has died !".format(nick=self.nick)
-			self.db.set_nick_value(self.nick, "hitPoints", 100)
+			self.db.set_nick_value(self.nick, "hitPoints", 100 + (xl * 3))
 		else:
 			newhp = self.hitPoints - damage
 			self.db.set_nick_value(self.nick, "hitPoints", newhp)
@@ -66,6 +71,10 @@ class fighter:
 		return fightEvents.onXpChange(self, xp)
 	def setXl(self, newXl):
 		self.db.set_nick_value(self.nick, "xl", newXl)
+	def setHealth(self, newHealth):
+		self.db.set_nick_value(self.nick, "hitPoints", newHealth) 
+	def setTime(self,delay):
+		self.db.set_nick_value(self.nick, "delay", datetime.datetime.now() + datetime.timedelta(seconds=delay))
 
 			
 		
@@ -94,7 +103,7 @@ class fightEvents:
 		return msg;
 #todo add benifits to levels aka attack chance and armor?
 def fightImpl(source, target):
-	maxIndex = len(fightStrings) - 1
+	
 	minDamage = 1
 	maxDamage = 25
 	minXpGain = 2
@@ -104,27 +113,35 @@ def fightImpl(source, target):
 	attack = random.randint(minAttack, maxAttack)
 	if attack <=95 or attack >= 5:
 		attack += source.xl
-	index = random.randint(0, maxIndex)
+	index = random.randint(0, maxIndex)#will go away soon
 	damage = random.randint(minDamage, maxDamage)
 	damageMsg =""
-	
-	if attack >= 50 and attack < 95:
-		baseMsg = fightStrings[index].format(source=source.nick, target=target.nick, damage=damage)
+	#attack hits
+	if attack >= 50:
+		f = open("/home/botuser/irc_bot/knife_scraper/attack.txt")
+    	attack_list = f.readlines()
+    	max_attack_list = len(attack_list)
+    	attack_num = randint(0,max_attack_list-1)
+		#crit hit double damage
+		if attack >= 95:
+			damage = damage * 2
+		baseMsg = attack_list[attack_num].format(source=source.nick, target=target.nick, damage=damage)
 		damageMsg = target.receiveDamage(damage)
-	elif attack >= 95:
-		damage = damage * 2
-		baseMsg = fightStrings[index].format(source=source.nick, target=target.nick, damage=damage)
-		damageMsg = target.receiveDamage(damage)
-	elif attack < 50 and attack > 5:
-		baseMsg = fightStrings[index].format(source=source.nick, target=target.nick)
-		damageMsg = target.receiveDamage(damage)
-	elif attack <= 5:
-		damage = damage / 2
-		baseMsg = fightStrings[index].format(source=source.nick, damage=damage)
-		damageMsg = source.receiveDamage(damage)
+	#attack misses
+	elif attack < 50:
+		maxIndex = len(MissStrings) - 1 #will go away soon
+		minDelay = 30
+		maxDelay = 180
+		if attack <= 5:
+			damage = damage / 2 + 1
+			baseMsg = CritMissStrings[index].format(source=source.nick, damage=damage)
+			damageMsg = source.receiveDamage(damage)
+		else:
+			baseMsg = MissStrings[index].format(source=source.nick, target=target.nick)
+			damageMsg = target.receiveDamage(damage)
+		source.setTime()
 	else:
-		baseMsg = fightStrings[index].format(source=source.nick, target=target.nick, damage=damage)
-		damageMsg = target.receiveDamage(damage)
+		baseMsg = "uname fucked up somehow"
 	xlChangedMessage = ""
 	
 	if damageMsg:
@@ -138,6 +155,7 @@ def fightImpl(source, target):
 def fight(bot, trigger):
 	sourceNick = trigger.nick
 	channel = trigger.sender
+	
 	if not trigger.group(2):
 		bot.say('fight whosits?')
 		return
@@ -157,6 +175,9 @@ def fight(bot, trigger):
 	# load the fighters
 	sourceFighter = fighter(bot.db, sourceNick)
 	targetFighter = fighter(bot.db, targetNick)
+	if sourceFighter.time >= datetime.datetime.now():
+		bot.reply('{source} cannot attack for {time} more seconds'.format(target=sourceNick, time=(sourceFighter.time - datetime.datetime.now()).strftime("%Y%m%dT%H%M%S%f")[13:-6])
+		return
 	msg = fightImpl(sourceFighter, targetFighter)
 	bot.say(msg)
 
@@ -173,5 +194,33 @@ def fighterStatus(bot, trigger):
 		bot.say('I can''t find stats for {nick}'.format(nick=targetNick))
 		return
 	else:
-		bot.say('{nick} has {hp} hit points / 100 @ XL {xl}'.format(nick=targetNick, hp=hitpoints, xl=xl))
+		bot.say('{nick} has {hp} hit points / {max} @ XL {xl}'.format(nick=targetNick, hp=hitpoints,max=100 + (xl*3), xl=xl))
 
+@commands('heal')
+@example('.heal fooobarrr')
+def fighterStatus(bot, trigger):
+	if not trigger.group(2):
+		bot.say('Heal who?')
+		return
+	targetNick = Identifier(trigger.group(2).strip())
+	sourceNick = trigger.nick
+	if not hitpoints:
+		bot.say('I can''t find stats for {nick}'.format(nick=targetNick))
+		return
+
+	hitpoints = bot.db.get_nick_value(targetNick,'hitPoints')
+	xl = bot.db.get_nick_value(targetNick,'xl')
+	max = 100 + (xl*3)
+	if hitpoints >= max:
+		bot.say('{nick} is already at full health'.format(nick=targetNick))
+		return
+	else:
+		targetFighter = fighter(bot.db, targetNick)
+		minHeal = 1
+		maxHeal = 25
+		Heal = random.randint(minHeal, maxHeal)
+		if (Heal + hitpoints) > max:
+			Heal -= (Heal + hitpoints) - 100 + (xl*3)
+		newHealth = hitpoints + Heal
+		targetFighter.setHealth(newHealth)
+		bot.say('{nick} has healed {target} for {heal} hit points and now has {hp} / {maxH} hitpoints'.format(nick=sourceNick,target=targetNick,heal=Heal,hp=hitpoints,maxH=max, xl=xl)
