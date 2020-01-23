@@ -25,7 +25,11 @@ xlMap = {0:10,
 	1:31,
 	2:100,
 	3:316,
-	4:1000}
+	4:1000,
+	5:1778,
+	6:3162,
+	7:5623,
+	8:10000}
 
 #fightStrings = [ "Bam boom pow! {source} stabs {target} for {damage} damage!",
 # "Krakow! {source} filets {target} for {damage} damage!",
@@ -42,7 +46,23 @@ class fighter:
 		self.db = db
 		self.nick = nick
 		self.xl = db.get_nick_value(nick, "xl")
-		self.delay = datetime.datetime.now()
+		self.delay = db.get_nick_value(nick, "delay")
+		self.la = db.get_nick_value(nick, "la")
+		self.speed = db.get_nick_value(nick, "speed")
+		self.power = db.get_nick_value(nick, "power")
+		self.defense = db.get_nick_value(nick, "defense")
+		if not self.la:
+			self.la = 0
+			db.set_nick_value(nick, "la", self.la)
+		if not self.speed:
+			self.speed = 0
+			db.set_nick_value(nick, "speed", self.speed)
+		if not self.power:
+			self.power = 0
+			db.set_nick_value(nick, "power", self.power)
+		if not self.defense:
+			self.defense = 0
+			db.set_nick_value(nick, "defense", self.defense)
 		if not self.xl:
 			self.xl = 0
 			db.set_nick_value(nick, "xl", self.xl)
@@ -61,7 +81,7 @@ class fighter:
 		msg = ""
 		if self.hitPoints < damage:
 			msg = " {nick} has died !".format(nick=self.nick)
-			self.db.set_nick_value(self.nick, "hitPoints", 100 + (xl * 3))
+			self.db.set_nick_value(self.nick, "hitPoints", 100 + (xl * 10))
 		else:
 			newhp = self.hitPoints - damage
 			self.db.set_nick_value(self.nick, "hitPoints", newhp)
@@ -71,10 +91,22 @@ class fighter:
 		return fightEvents.onXpChange(self, xp)
 	def setXl(self, newXl):
 		self.db.set_nick_value(self.nick, "xl", newXl)
+	def setLA(self, newXl):
+		self.db.set_nick_value(self.nick, "la", self.la + newXl)
 	def setHealth(self, newHealth):
 		self.db.set_nick_value(self.nick, "hitPoints", newHealth) 
 	def setTime(self,delay):
 		self.db.set_nick_value(self.nick, "delay", datetime.datetime.now() + datetime.timedelta(seconds=delay))
+	def setPower(self, newXl):
+		self.db.set_nick_value(self.nick, "power", newXl)
+	def setSpeed(self, newXl):
+		self.db.set_nick_value(self.nick, "speed", newXl)
+	def setDef(self, newXl):
+		self.db.set_nick_value(self.nick, "defense", newXl)
+
+
+
+
 
 			
 		
@@ -90,13 +122,17 @@ class fightEvents:
 	def onXpChange(aFighter, gainedXp):
 		newXl = aFighter.xl
 		newXp = gainedXp + aFighter.xp
+		temp = 0
 		while xlMap[newXl] < newXp:
 			newXl += 1
+			temp +=1
 		xlDiff = newXl - aFighter.xl
+		
 		if xlDiff > 0:
 			aFighter.setXl(newXl)
+			aFighter.setLA(temp)
 		else:
-			return ""
+			return "You gained {totalLevels} XP".format(totalLevels=gainedXp)
 		msg = "You gained {totalLevels} experience level".format(totalLevels=xlDiff)
 		if xlDiff  > 1:
 			msg += "s"
@@ -111,35 +147,36 @@ def fightImpl(source, target):
 	minAttack = 1
 	maxAttack = 100
 	attack = random.randint(minAttack, maxAttack)
-	if attack <=95 or attack >= 5:
-		attack += source.xl
+	if attack < 95 or attack > 5:
+		attack += source.xl * 5
 	index = random.randint(0, maxIndex)#will go away soon
-	damage = random.randint(minDamage, maxDamage)
+	damage = random.randint(minDamage, maxDamage) + source.xl 
 	damageMsg =""
 	#attack hits
 	if attack >= 50:
 		f = open("/home/botuser/irc_bot/knife_scraper/attack.txt")
-    	attack_list = f.readlines()
-    	max_attack_list = len(attack_list)
+		attack_list = f.readlines()
+		max_attack_list = len(attack_list)
     	attack_num = randint(0,max_attack_list-1)
 		#crit hit double damage
 		if attack >= 95:
-			damage = damage * 2
+			damage = damage * 2 
 		baseMsg = attack_list[attack_num].format(source=source.nick, target=target.nick, damage=damage)
 		damageMsg = target.receiveDamage(damage)
 	#attack misses
 	elif attack < 50:
 		maxIndex = len(MissStrings) - 1 #will go away soon
-		minDelay = 30
-		maxDelay = 180
+		minDelay = 10
+		maxDelay = 100
+		delay = random.randint(minDelay, maxDelay)
+		#crit misses attack self
 		if attack <= 5:
-			damage = damage / 2 + 1
+			damage = damage * 2 
 			baseMsg = CritMissStrings[index].format(source=source.nick, damage=damage)
 			damageMsg = source.receiveDamage(damage)
 		else:
 			baseMsg = MissStrings[index].format(source=source.nick, target=target.nick)
-			damageMsg = target.receiveDamage(damage)
-		source.setTime()
+		source.setTime(delay)
 	else:
 		baseMsg = "uname fucked up somehow"
 	xlChangedMessage = ""
@@ -184,6 +221,7 @@ def fight(bot, trigger):
 @commands('fstat')
 @example('.fstat fooobarrr')
 def fighterStatus(bot, trigger):
+
 	if not trigger.group(2):
 		bot.say('fighter status for who?')
 		return
@@ -194,11 +232,44 @@ def fighterStatus(bot, trigger):
 		bot.say('I can''t find stats for {nick}'.format(nick=targetNick))
 		return
 	else:
-		bot.say('{nick} has {hp} hit points / {max} @ XL {xl}'.format(nick=targetNick, hp=hitpoints,max=100 + (xl*3), xl=xl))
+		bot.say('{nick} has {hp} hit points / {max} @ Level {xl} with {xp} xp until the next level'.format(nick=targetNick, hp=hitpoints,max=100 + (xl*3), xl=xl,xp=xlMap[bot.db.get_nick_value(targetNick,'xl') + 1] - bot.db.get_nick_value(targetNick,'xp')))
+
+@commands('level')
+@example('.level power')
+def Leveling(bot, trigger):
+	sourceNick = trigger.nick
+	trigger.group(2)
+	if not trigger.group(2):
+		bot.say('pick power, speed, or defense aka .level power')
+		return
+	power = Identifier(trigger.group(2).strip())
+	
+	target = fighter(bot.db, sourceNick)
+	
+	if target.la <=0:
+		bot.say('you have no levels available to spend')
+		return
+	if power = "power" :
+		target.setPower(target.power + 1)
+		target.la -= 1
+		bot.say('power is now {power} and you have {level}s left'.format(power=target.power,level=target.la))
+	elif power = "speed":
+		target.setSpeed(target.speed + 1)
+		target.la -= 1
+		bot.say('speed is now {power} and you have {level}s left'.format(power=target.speed,level=target.la))
+	elif power = "defense":
+		target.setDef(target.defense + 1)
+		target.la -= 1
+		bot.say('defense is now {power} and you have {level}s left'.format(power=target.defense,level=target.la))
+	else:
+		bot.say('pick power, speed, or defense aka .level power')
+		return
+	
+	
 
 @commands('heal')
 @example('.heal fooobarrr')
-def fighterStatus(bot, trigger):
+def Healing(bot, trigger):
 	if not trigger.group(2):
 		bot.say('Heal who?')
 		return
