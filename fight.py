@@ -105,12 +105,6 @@ class fighter:
 		self.db.set_nick_value(self.nick, "defense", newXl)
 
 
-
-
-
-			
-		
-
 class fightEvents:
 	# Event for "on xp change" - Don't assume only one level can be increased at one
 	# time
@@ -151,6 +145,11 @@ def fightImpl(source, target):
 		attack += source.xl * 5
 	index = random.randint(0, maxIndex)#will go away soon
 	damage = random.randint(minDamage, maxDamage) + source.xl 
+	# add modifiers 
+	attack -= target.defense * 3
+	damage += source.power * 3
+
+
 	damageMsg =""
 	#attack hits
 	if attack >= 50:
@@ -167,8 +166,9 @@ def fightImpl(source, target):
 	elif attack < 50:
 		maxIndex = len(MissStrings) - 1 #will go away soon
 		minDelay = 10
-		maxDelay = 100
+		maxDelay = 60
 		delay = random.randint(minDelay, maxDelay)
+		delay -= source.speed * 5
 		#crit misses attack self
 		if attack <= 5:
 			damage = damage * 2 
