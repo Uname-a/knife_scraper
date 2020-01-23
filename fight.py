@@ -18,7 +18,7 @@ import random
 
 # Xp levels
 # start = 1
-# stop  = log10(1000)
+# stop  = log10(10000)
 # nsteps = 5
 # spacing = floor(logspace(start,stop,nsteps))
 xlMap = {0:10,
@@ -51,6 +51,7 @@ class fighter:
 		self.speed = db.get_nick_value(nick, "speed")
 		self.power = db.get_nick_value(nick, "power")
 		self.defense = db.get_nick_value(nick, "defense")
+		self.holy = db.get_nick_value(nick, "holy")
 		if not self.la:
 			self.la = 0
 			db.set_nick_value(nick, "la", self.la)
@@ -63,6 +64,9 @@ class fighter:
 		if not self.defense:
 			self.defense = 0
 			db.set_nick_value(nick, "defense", self.defense)
+		if not self.holy:
+			self.holy = 0
+			db.set_nick_value(nick, "holy", self.holy)
 		if not self.xl:
 			self.xl = 0
 			db.set_nick_value(nick, "xl", self.xl)
@@ -103,6 +107,8 @@ class fighter:
 		self.db.set_nick_value(self.nick, "speed", newXl)
 	def setDef(self, newXl):
 		self.db.set_nick_value(self.nick, "defense", newXl)
+	def setHoly(self, newXl):
+		self.db.set_nick_value(self.nick, "holy", newXl)
 
 
 class fightEvents:
@@ -156,7 +162,7 @@ def fightImpl(source, target):
 		f = open("/home/botuser/irc_bot/knife_scraper/attack.txt")
 		attack_list = f.readlines()
 		max_attack_list = len(attack_list)
-    	attack_num = randint(0,max_attack_list-1)
+		attack_num = randint(0,max_attack_list-1)
 		#crit hit double damage
 		if attack >= 95:
 			damage = damage * 2 
@@ -287,7 +293,8 @@ def Healing(bot, trigger):
 		return
 	else:
 		targetFighter = fighter(bot.db, targetNick)
-		minHeal = 1
+		SourceFighter = fighter(bot.db, sourceNick)
+		minHeal = 5
 		maxHeal = 25
 		Heal = random.randint(minHeal, maxHeal)
 		if (Heal + hitpoints) > max:
@@ -295,3 +302,52 @@ def Healing(bot, trigger):
 		newHealth = hitpoints + Heal
 		targetFighter.setHealth(newHealth)
 		bot.say('{nick} has healed {target} for {heal} hit points and now has {hp} / {maxH} hitpoints'.format(nick=sourceNick,target=targetNick,heal=Heal,hp=hitpoints,maxH=max, xl=xl)
+		sourceFighter.setHoly(SourceFighter.holy + 1)
+
+
+@commands('smite')
+@example('.smite pf')
+def smite(bot, trigger):
+	sourceNick = trigger.nick
+	channel = trigger.sender
+	
+	if not trigger.group(2):
+		bot.say('smite whosits?')
+		return
+	targetNick = Identifier(trigger.group(2).strip())
+	if targetNick == "knifebot":
+		bot.say('knifebot dodges with robotic skill')
+		return
+	if channel not in bot.channels:
+		bot.reply('You can''t fight here!')
+		return
+	if targetNick not in bot.channels[channel].users:
+		bot.reply('{target} is not in this channel [[{channel}]]'.format(target=targetNick, channel=channel))
+		return
+	# load the fighters
+	sourceFighter = fighter(bot.db, sourceNick)
+	targetFighter = fighter(bot.db, targetNick)
+	if sourceFighter.holy > 0 :
+		minHoly = 1
+		maxHoly = 100
+		Holy = random.randint(minHoly, maxHoly)
+		if sourceFighter.holy >= 100:
+			Holy = 80
+			sourceFighter.setHoly(sourceFighter.holy - 100)
+		else:
+			if (sourceFighter.holy + Holy) > 80:
+				Holy = 80
+			else:
+				Holy += sourceFighter.holy 
+			sourceFighter.setHoly(0)
+		if Holy >= 90:
+			msg = '{nick} has called upon the gods to smite {target} and has been answered'.format(nick=sourceNick,target=targetNick)
+			bot.say(msg)
+			bot.say(mstargetFighter.receiveDamage(75))
+		else:
+			msg = '{nick} has called upon the gods to smite {target} and has been ignored'.format(nick=sourceNick,target=targetNick)
+			bot.say(msg)
+	else:
+		bot.say('You have no holy points')
+		return
+	
