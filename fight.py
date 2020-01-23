@@ -154,8 +154,6 @@ def fightImpl(source, target):
 	# add modifiers 
 	attack -= target.defense * 3
 	damage += source.power * 3
-
-
 	damageMsg =""
 	#attack hits
 	if attack >= 50:
