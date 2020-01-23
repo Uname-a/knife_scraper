@@ -102,9 +102,12 @@ def fightImpl(source, target):
 	minAttack = 1
 	maxAttack = 100
 	attack = random.randint(minAttack, maxAttack)
+	if attack <=95 or attack >= 5:
+		attack += source.xl
 	index = random.randint(0, maxIndex)
 	damage = random.randint(minDamage, maxDamage)
 	damageMsg =""
+	
 	if attack >= 50 and attack < 95:
 		baseMsg = fightStrings[index].format(source=source.nick, target=target.nick, damage=damage)
 		damageMsg = target.receiveDamage(damage)
