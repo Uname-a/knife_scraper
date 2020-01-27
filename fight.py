@@ -132,7 +132,7 @@ class fighter:
 			self.hitPoints=100
 			db.set_nick_value(nick, "hitPoints", self.hitPoints)
 		if not self.delay:
-			self.delay = datetime.datetime.now()
+			self.delay = 0
 			db.set_nick_value(nick, "time", self.delay)
 	@property
 	def store(self):
@@ -156,7 +156,7 @@ class fighter:
 	def setHealth(self, newHealth):
 		self.db.set_nick_value(self.nick, "hitPoints", newHealth) 
 	def setTime(self,delay):
-		self.db.set_nick_value(self.nick, "delay", datetime.datetime.now() + datetime.timedelta(seconds=delay))
+		self.db.set_nick_value(self.nick, "delay", (datetime.datetime.now() + datetime.timedelta(seconds=delay)).strftime("%y%m%d%H%M%S"))
 	def setPower(self, newXl):
 		self.db.set_nick_value(self.nick, "power", newXl)
 	def setSpeed(self, newXl):
@@ -274,8 +274,9 @@ def fight(bot, trigger):
 	# load the fighters
 	sourceFighter = fighter(bot.db, sourceNick)
 	targetFighter = fighter(bot.db, targetNick)
-	if sourceFighter.delay >= datetime.datetime.now():
-		bot.reply('{source} cannot attack for {time} more seconds'.format(target=sourceNick, time=(sourceFighter.time - datetime.datetime.now()).strftime("%Y%m%dT%H%M%S%f")[13:-6]))
+	if int(sourceFighter.delay) >= int(datetime.datetime.now().strftime("%y%m%d%H%M%S")):
+        tt= int(sourceFighter.delay) - int(datetime.datetime.now().strftime("%y%m%d%H%M%S"))
+		bot.reply('{target} cannot attack for {time} more seconds'.format(target=sourceNick, time=tt))
 		return
 	msg = fightImpl(sourceFighter, targetFighter)
 	bot.say(msg)
