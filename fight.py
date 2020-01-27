@@ -274,7 +274,7 @@ def fight(bot, trigger):
 	# load the fighters
 	sourceFighter = fighter(bot.db, sourceNick)
 	targetFighter = fighter(bot.db, targetNick)
-	if sourceFighter.time >= datetime.datetime.now():
+	if sourceFighter.delay >= datetime.datetime.now():
 		bot.reply('{source} cannot attack for {time} more seconds'.format(target=sourceNick, time=(sourceFighter.time - datetime.datetime.now()).strftime("%Y%m%dT%H%M%S%f")[13:-6]))
 		return
 	msg = fightImpl(sourceFighter, targetFighter)
