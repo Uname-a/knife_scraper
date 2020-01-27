@@ -71,7 +71,7 @@ class DatabaseProperty:
 	@property
 	def value(self):
 		return self.store.db.get_nick_value(self.store.UUID, self.key)
-	@value.setter()
+	@value.setter
 	def value(self, value):
 		self.store.db.set_nick_value(self.store.UUID, self.key, value)
 
