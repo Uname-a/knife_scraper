@@ -40,9 +40,61 @@ MissStrings = [ "Oh no {source} misses {target} and deals no damage and cannot a
 
 CritMissStrings = [ "Oh no {source} is confused and attacked themself for {damage} damage! and cannot attack for {delay} seconds"]
 
+class nickDBAssocation:
+	def __init__(self, db, UUID):
+		self._db = db
+		self._UUID = UUID
+	@property
+	def db(self):
+		return self._db
+	@property
+	def UUID(self):
+		return self._UUID
+
+"""
+DatabaseProperty is a convenience method for getting/setting values in a database
+"""
+class DatabaseProperty:
+	def __init__(self, nickDB, propertyKey, propDefaultValue=0):
+		self._nickStore = nickDB
+		self._key  = propertyKey
+		# validate that the property exists - if not create it (by setting the value in the DB)
+		prop = self.value
+		if not prop:
+			self.set(propDefaultValue)
+	@property
+	def key(self):
+		return self._key
+	@property
+	def store(self):
+		return self._nickStore
+	@property
+	def value(self):
+		return self.store.db.get_nick_value(self.store.UUID, self.key)
+	@value.setter
+	def value(self, value):
+		self.store.db.set_nick_value(self.store.UUID, self.key, value)
+
+# convenience method to generate properties 
+class DatabasePropertyFactory:
+	def __init__(self, nickStore):
+		self._nickStore = nickStore
+	@property
+	def nickStore(self):
+		return self._nickStore
+	def generate(self, propName, *kwargs):
+		if "default" in kwargs:
+			return DatabaseProperty(self.nickStore, propName, propDefaultValue=kwargs["default"])
+		else:
+			return DatabaseProperty(self.nickStore, propName)
+
 
 class fighter:
 	def __init__(self, db, nick):
+		self._store = nickDBAssocation(db, nick)
+		propFactory = DatabasePropertyFactory(self.store)
+		#self.xl = propFactory("xl", default=1)
+		self.xl = db.get_nick_value(nick, "xl")
 		self.db = db
 		self.nick = nick
 		self.xl = db.get_nick_value(nick, "xl")
@@ -52,6 +104,7 @@ class fighter:
 		self.power = db.get_nick_value(nick, "power")
 		self.defense = db.get_nick_value(nick, "defense")
 		self.holy = db.get_nick_value(nick, "holy")
+
 		if not self.la:
 			self.la = 0
 			db.set_nick_value(nick, "la", self.la)
@@ -80,7 +133,10 @@ class fighter:
 			db.set_nick_value(nick, "hitPoints", self.hitPoints)
 		if not self.delay:
 			self.delay = 0
-			db.set_nick_value(nick, "delay", self.delay)
+			db.set_nick_value(nick, "time", self.delay)
+	@property
+	def store(self):
+		return self._store
 	def receiveDamage(self, damage):
 		msg = ""
 		if self.hitPoints < damage:
@@ -157,7 +213,7 @@ def fightImpl(source, target):
 	damageMsg =""
 	#attack hits
 	if attack >= 50:
-		f = open("/home/botuser/irc_bot/knife_scraper/attack.txt")
+		f = open("/home/botuser/knife_scraper/attack.txt")
 		attack_list = f.readlines()
 		max_attack_list = len(attack_list)
 		attack_num = random.randint(0,max_attack_list-1)
@@ -217,7 +273,7 @@ def fight(bot, trigger):
 	sourceFighter = fighter(bot.db, sourceNick)
 	targetFighter = fighter(bot.db, targetNick)
 	if int(sourceFighter.delay) >= int(datetime.datetime.now().strftime("%y%m%d%H%M%S")):
-		tt= int(sourceFighter.delay) - int(datetime.datetime.now().strftime("%y%m%d%H%M%S"))
+        tt= int(sourceFighter.delay) - int(datetime.datetime.now().strftime("%y%m%d%H%M%S"))
 		bot.reply('{target} cannot attack for {time} more seconds'.format(target=sourceNick, time=tt))
 		return
 		
@@ -239,6 +295,39 @@ def fighterStatus(bot, trigger):
 		return
 	else:
 		bot.say('{nick} has {hp} hit points / {max} @ Level {xl} with {xp} xp until the next level'.format(nick=targetNick, hp=hitpoints,max=100 + (xl*3), xl=xl,xp=xlMap[bot.db.get_nick_value(targetNick,'xl') + 1] - bot.db.get_nick_value(targetNick,'xp')))
+
+@commands('level')
+@example('.level power')
+def Leveling(bot, trigger):
+	sourceNick = trigger.nick
+	trigger.group(2)
+	if not trigger.group(2):
+		bot.say('pick power, speed, or defense aka .level power')
+		return
+	power = Identifier(trigger.group(2).strip())
+	
+	target = fighter(bot.db, sourceNick)
+	
+	if target.la <=0:
+		bot.say('you have no levels available to spend')
+		return
+	if power == "power" :
+		target.setPower(target.power + 1)
+		target.la -= 1
+		bot.say('power is now {power} and you have {level}s left'.format(power=target.power,level=target.la))
+	elif power == "speed":
+		target.setSpeed(target.speed + 1)
+		target.la -= 1
+		bot.say('speed is now {power} and you have {level}s left'.format(power=target.speed,level=target.la))
+	elif power == "defense":
+		target.setDef(target.defense + 1)
+		target.la -= 1
+		bot.say('defense is now {power} and you have {level}s left'.format(power=target.defense,level=target.la))
+	else:
+		bot.say('pick power, speed, or defense aka .level power')
+		return
+	
+
 
 
 
