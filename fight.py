@@ -312,22 +312,21 @@ def Leveling(bot, trigger):
 	if target.la <=0:
 		bot.say('you have no levels available to spend')
 		return
-	if power = "power" :
+	if power == "power" :
 		target.setPower(target.power + 1)
 		target.la -= 1
 		bot.say('power is now {power} and you have {level}s left'.format(power=target.power,level=target.la))
-	elif power = "speed":
+	elif power == "speed":
 		target.setSpeed(target.speed + 1)
 		target.la -= 1
 		bot.say('speed is now {power} and you have {level}s left'.format(power=target.speed,level=target.la))
-	elif power = "defense":
+	elif power == "defense":
 		target.setDef(target.defense + 1)
 		target.la -= 1
 		bot.say('defense is now {power} and you have {level}s left'.format(power=target.defense,level=target.la))
 	else:
 		bot.say('pick power, speed, or defense aka .level power')
 		return
-	
 	
 
 @commands('heal')
