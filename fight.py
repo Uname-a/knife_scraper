@@ -40,9 +40,61 @@ MissStrings = [ "Oh no {source} misses {target} and deals no damage and cannot a
 
 CritMissStrings = [ "Oh no {source} is confused and attacked themself for {damage} damage! and cannot attack for {delay} mins"]
 
+class nickDBAssocation:
+	def __init__(self, db, UUID):
+		self._db = db
+		self._UUID = UUID
+	@property
+	def db(self):
+		return self._db
+	@property
+	def UUID(self):
+		return self._UUID
+
+"""
+DatabaseProperty is a convenience method for getting/setting values in a database
+"""
+class DatabaseProperty:
+	def __init__(self, nickDB, propertyKey, propDefaultValue=0):
+		self._nickStore = nickDB
+		self._key  = propertyKey
+		# validate that the property exists - if not create it (by setting the value in the DB)
+		prop = self.value
+		if not prop:
+			self.set(propDefaultValue)
+	@property
+	def key(self):
+		return self._key
+	@property
+	def store(self):
+		return self._nickStore
+	@property
+	def value(self):
+		return self.store.db.get_nick_value(self.store.UUID, self.key)
+	@value.setter()
+	def value(self, value):
+		self.store.db.set_nick_value(self.store.UUID, self.key, value)
+
+# convenience method to generate properties 
+class DatabasePropertyFactory:
+	def __init__(self, nickStore):
+		self._nickStore = nickStore
+	@property
+	def nickStore(self):
+		return self._nickStore
+	def generate(self, propName, *kwargs):
+		if "default" in kwargs:
+			return DatabaseProperty(self.nickStore, propName, propDefaultValue=kwargs["default"])
+		else:
+			return DatabaseProperty(self.nickStore, propName)
+
 
 class fighter:
 	def __init__(self, db, nick):
+		self._store = nickDBAssocation(db, nick)
+		propFactory = DatabasePropertyFactory(self.store)
+		#self.xl = propFactory("xl", default=1)
+		self.xl = db.get_nick_value(nick, "xl")
 		self.db = db
 		self.nick = nick
 		self.xl = db.get_nick_value(nick, "xl")
@@ -52,6 +104,11 @@ class fighter:
 		self.power = db.get_nick_value(nick, "power")
 		self.defense = db.get_nick_value(nick, "defense")
 		self.holy = db.get_nick_value(nick, "holy")
+
+		@property
+		def store(self):
+			return self._store
+
 		if not self.la:
 			self.la = 0
 			db.set_nick_value(nick, "la", self.la)
@@ -219,7 +276,7 @@ def fight(bot, trigger):
 	sourceFighter = fighter(bot.db, sourceNick)
 	targetFighter = fighter(bot.db, targetNick)
 	if sourceFighter.time >= datetime.datetime.now():
-		bot.reply('{source} cannot attack for {time} more seconds'.format(target=sourceNick, time=(sourceFighter.time - datetime.datetime.now()).strftime("%Y%m%dT%H%M%S%f")[13:-6])
+		bot.reply('{source} cannot attack for {time} more seconds'.format(target=sourceNick, time=(sourceFighter.time - datetime.datetime.now()).strftime("%Y%m%dT%H%M%S%f")[13:-6]))
 		return
 	msg = fightImpl(sourceFighter, targetFighter)
 	bot.say(msg)
