@@ -105,10 +105,6 @@ class fighter:
 		self.defense = db.get_nick_value(nick, "defense")
 		self.holy = db.get_nick_value(nick, "holy")
 
-		@property
-		def store(self):
-			return self._store
-
 		if not self.la:
 			self.la = 0
 			db.set_nick_value(nick, "la", self.la)
@@ -138,6 +134,9 @@ class fighter:
 		if not self.delay:
 			self.delay = datetime.datetime.now()
 			db.set_nick_value(nick, "time", self.delay)
+	@property
+	def store(self):
+		return self._store
 	def receiveDamage(self, damage):
 		msg = ""
 		if self.hitPoints < damage:
