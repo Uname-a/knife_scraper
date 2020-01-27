@@ -357,7 +357,7 @@ def Healing(bot, trigger):
 			Heal -= (Heal + hitpoints) - 100 + (xl*3)
 		newHealth = hitpoints + Heal
 		targetFighter.setHealth(newHealth)
-		bot.say('{nick} has healed {target} for {heal} hit points and now has {hp} / {maxH} hitpoints'.format(nick=sourceNick,target=targetNick,heal=Heal,hp=hitpoints,maxH=max, xl=xl)
+		bot.say('{nick} has healed {target} for {heal} hit points and now has {hp} / {maxH} hitpoints'.format(nick=sourceNick,target=targetNick,heal=Heal,hp=hitpoints,maxH=max, xl=xl))
 		sourceFighter.setHoly(SourceFighter.holy + 1)
 
 
