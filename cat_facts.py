@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # bhq_query.py - module for sopel to query blade head quarters site for knife data
 # 
-# Copyright (c) 2015,2016 Casey Bartlett <caseytb@bu.edu>
+# Copyright (c) 2015,2016,2020 Casey Bartlett <caseytb@bu.edu>
 # 
 # See LICENSE for terms of usage, modification and redistribution.
 
@@ -12,7 +12,7 @@ from random import randint
 @module.rate(10)
 def knife(bot, trigger):
     """ Tell someone a wonderful fact about cats """
-    f = open("/home/botuser/irc_bot/knife_scraper/cat_facts.txt")
+    f = open("~/knife_scraper/cat_facts.txt")
     fact_list = f.readlines()
     max_fact = len(fact_list)
     fact_num = randint(0,max_fact-1)
