@@ -298,7 +298,7 @@ def fight(bot, trigger):
 	targetFighter = fighter(bot.db, targetNick)
 	nextTimeSourceAvailable = datetime.strpfmt(sourceFighter.delay, TimeFormat)
 	if nextTimeSourceAvailable >= currentTime:
-        duration = nextTimeSourceAvailable - currentTime
+		duration = nextTimeSourceAvailable - currentTime
 		# we lie here a little 
 		durationInSeconds = int(duration.total_seconds()) if duration.total_seconds() > 0 else 1
 		bot.reply('{target} cannot attack for {time} more seconds'.format(target=sourceNick, time=durationInSeconds))
