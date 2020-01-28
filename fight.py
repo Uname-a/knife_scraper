@@ -318,7 +318,7 @@ def fighterStatus(bot, trigger):
 		bot.say('I can''t find stats for {nick}'.format(nick=targetNick))
 		return
 	else:
-		bot.say('{nick} has {hp} / {max} hp @ Level {xl} with {xp} xp until the next level'.format(nick=targetNick, hp=hitpoints,max=100 + (xl*3), xl=xl,xp=xlMap[bot.db.get_nick_value(targetNick,'xl') + 1] - bot.db.get_nick_value(targetNick,'xp')))
+		bot.say('{nick} has {hp} / {max} hp @ Level {xl} with {xp} xp until the next level'.format(nick=targetNick, hp=hitpoints,max=100 + (xl*10), xl=xl,xp=xlMap[bot.db.get_nick_value(targetNick,'xl') + 1] - bot.db.get_nick_value(targetNick,'xp')))
 
 @commands('level')
 @example('.level power')
