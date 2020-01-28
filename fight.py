@@ -157,8 +157,10 @@ class fighter:
 		return fightEvents.onXpChange(self, xp)
 	def setXl(self, newXl):
 		self.db.set_nick_value(self.nick, "xl", newXl)
-	def setLA(self, newXl):
-		self.db.set_nick_value(self.nick, "la", self.la + newXl)
+	def setLA(self, newLA):
+		self.db.set_nick_value(self.nick, "la", newLA)
+	def adjustLA(self, adjust):
+		self.db.set_nick_value(self.nick, "la", self.la + adjust)
 	def setHealth(self, newHealth):
 		self.db.set_nick_value(self.nick, "hitPoints", newHealth) 
 	def setTime(self,delay):
@@ -192,7 +194,7 @@ class fightEvents:
 		
 		if xlDiff > 0:
 			aFighter.setXl(newXl)
-			aFighter.setLA(temp)
+			aFighter.adjustLA(temp)
 		else:
 			return "You gained {totalLevels} XP".format(totalLevels=gainedXp)
 		msg = "You gained {totalLevels} experience level".format(totalLevels=xlDiff)
@@ -340,25 +342,25 @@ def Leveling(bot, trigger):
 	
 	target = fighter(bot.db, sourceNick)
 	
-	if target.la <=0:
+	if target.la < 1:
 		bot.say('you have no levels available to spend')
+		target.setLA(0)
 		return
 	if power == "power" :
 		target.setPower(target.power + 1)
-		target.la -= 1
+		target.adjustLA(-1)
 		bot.say('power is now {power} and you have {level}s left'.format(power=target.power,level=target.la))
 	elif power == "speed":
 		target.setSpeed(target.speed + 1)
-		target.la -= 1
+		target.adjustLA(-1)
 		bot.say('speed is now {power} and you have {level}s left'.format(power=target.speed,level=target.la))
 	elif power == "defense":
 		target.setDef(target.defense + 1)
-		target.la -= 1
+		target.adjustLA(-1)
 		bot.say('defense is now {power} and you have {level}s left'.format(power=target.defense,level=target.la))
 	else:
 		bot.say('pick power, speed, or defense aka .level power')
 		return
-	
 
 @commands('heal')
 @example('.heal fooobarrr')
