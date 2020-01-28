@@ -299,7 +299,7 @@ def fight(bot, trigger):
 		nextTimeSourceAvailable = datetime.datetime.strptime(sourceFighter.delay, TimeFormat)
 	except ValueError as err:
 		# just reset the delay so that next time this will work
-		source.setTime(0)
+		sourceFighter.setTime(0)
 		pass
 	if nextTimeSourceAvailable >= currentTime:
 		duration = nextTimeSourceAvailable - currentTime
