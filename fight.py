@@ -323,7 +323,7 @@ def fighterStatus(bot, trigger):
 		return
 	else:
 		currentXp = bot.db.get_nick_value(targetNick,'xp')
-		remainingXp = xlMap[xl+1] - currentXp) 
+		remainingXp = xlMap[xl+1] - currentXp
 		bot.say('{nick} has {hp} / {max} hp @ Level {xl} with {remainingXp} xp until the next level'.format(nick=targetNick, hp=hitpoints,max=100 + (xl*10), xl=xl, remainingXp=remainingXp)
 
 @commands('level')
