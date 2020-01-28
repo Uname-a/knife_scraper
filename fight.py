@@ -94,7 +94,7 @@ class DatabasePropertyFactory:
 		else:
 			return DatabaseProperty(self.nickStore, propName)
 
-N
+
 class fighter:
 	def __init__(self, db, nick):
 		self._store = nickDBAssocation(db, nick)
@@ -113,7 +113,7 @@ class fighter:
 
 		if not self.la:
 			self.la = 0
-			db.set_nick_value(nick,N "la", self.la)
+			db.set_nick_value(nick, "la", self.la)
 		if not self.speed:
 			self.speed = 0
 			db.set_nick_value(nick, "speed", self.speed)
