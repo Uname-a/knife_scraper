@@ -260,7 +260,7 @@ def fightImpl(source, target):
 		# A better method needs to be implemented, but basically the minimum fights would be 10
 		# to level up
 		minXpGain = 2
-		maxXpGain = xlMap[target.xl] / 10 if target.xl in xlMap else  xlStop / 10
+		maxXpGain = int(xlMap[target.xl] / 10 if target.xl in xlMap else  xlStop / 10)
 		xpGained = random.randint(minXpGain, maxXpGain)
 		xlChangedMessage = source.receiveExperience(xpGained)
 	return "{base} {damage} {xl}".format(base=baseMsg, damage=damageMsg, xl=xlChangedMessage)
