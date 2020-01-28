@@ -217,9 +217,10 @@ def fightImpl(source, target):
 	targetDied = False
 	sourceDied = False
 
+	attackMissTransition=15
 	damageMsg =""
 	#attack hits
-	if attack >= 50:
+	if attack >= attackMissTransition:
 		f = open("/home/botuser/.sopel/attack.txt")
 		attack_list = f.readlines()
 		max_attack_list = len(attack_list)
@@ -232,7 +233,7 @@ def fightImpl(source, target):
 		if damageMsg:
 			targetDied = True
 	#attack misses
-	elif attack < 50:
+	elif attack < attackMissTransition:
 		minDelay = 10
 		maxDelay = 60
 		delay = random.randint(minDelay, maxDelay)
@@ -243,16 +244,13 @@ def fightImpl(source, target):
 		if attack <= 5:
 			damage = damage * 2 
 			baseMsg = CritMissStrings[index].format(source=source.nick, damage=damage, delay=delay)
-			damageMsg = source.receiveDamage(damage)
-			if damageMsg:
-				targetDied = True
 		else:
 			baseMsg = MissStrings[index].format(source=source.nick, target=target.nick, delay=delay)
-			damageMsg = target.receiveDamage(damage)
-			# source managed to kill themselves
-			if damageMsg:
-				sourceDied = True
-				damageMsg  = "I can't believe you've done this. " + damageMsg
+		damageMsg = source.receiveDamage(damage)
+		# source managed to kill themselves
+		if damageMsg:
+			sourceDied = True
+			damageMsg  = "I can't believe you've done this. " + damageMsg
 		source.setTime(delay)
 	else:
 		baseMsg = "uname fucked up somehow"
