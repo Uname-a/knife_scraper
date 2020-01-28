@@ -151,7 +151,7 @@ class fighter:
 			self.db.set_nick_value(self.nick, "hitPoints", newhp)
 		return msg
 	def receiveExperience(self, xp):
-		self.db.set_nick_value(self.nick, "xp", xp)
+		self.db.set_nick_value(self.nick, "xp", self.xp + xp)
 		return fightEvents.onXpChange(self, xp)
 	def setXl(self, newXl):
 		self.db.set_nick_value(self.nick, "xl", newXl)
@@ -322,7 +322,9 @@ def fighterStatus(bot, trigger):
 		bot.say('I can''t find stats for {nick}'.format(nick=targetNick))
 		return
 	else:
-		bot.say('{nick} has {hp} / {max} hp @ Level {xl} with {xp} xp until the next level'.format(nick=targetNick, hp=hitpoints,max=100 + (xl*10), xl=xl,xp=xlMap[bot.db.get_nick_value(targetNick,'xl') + 1] - bot.db.get_nick_value(targetNick,'xp')))
+		currentXp = bot.db.get_nick_value(targetNick,'xp')
+		remainingXp = xlMap[xl+1] - currentXp) 
+		bot.say('{nick} has {hp} / {max} hp @ Level {xl} with {remainingXp} xp until the next level'.format(nick=targetNick, hp=hitpoints,max=100 + (xl*10), xl=xl, remainingXp=remainingXp)
 
 @commands('level')
 @example('.level power')
