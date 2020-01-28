@@ -22,6 +22,8 @@ import random
 # nsteps = 5
 # spacing = floor(logspace(start,stop,nsteps))
 xlStop = 10000
+xlScaling = 2
+xlMinScaling = 3
 xlMap = {0:10,
 	1:31,
 	2:100,
@@ -92,7 +94,7 @@ class DatabasePropertyFactory:
 		else:
 			return DatabaseProperty(self.nickStore, propName)
 
-
+N
 class fighter:
 	def __init__(self, db, nick):
 		self._store = nickDBAssocation(db, nick)
@@ -111,7 +113,7 @@ class fighter:
 
 		if not self.la:
 			self.la = 0
-			db.set_nick_value(nick, "la", self.la)
+			db.set_nick_value(nick,N "la", self.la)
 		if not self.speed:
 			self.speed = 0
 			db.set_nick_value(nick, "speed", self.speed)
@@ -259,8 +261,8 @@ def fightImpl(source, target):
 	if targetDied:
 		# A better method needs to be implemented, but basically the minimum fights would be 10
 		# to level up
-		minXpGain = 2
-		maxXpGain = int(xlMap[target.xl] / 10 if target.xl in xlMap else  xlStop / 10)
+		minXpGain = int(xlMap[target.xl] / xlMinScaling if target.xl in xlMap else  xlStop / xlMinScaling)
+		maxXpGain = int(xlMap[target.xl] / xlScaling if target.xl in xlMap else  xlStop / xlScaling)
 		xpGained = random.randint(minXpGain, maxXpGain)
 		xlChangedMessage = source.receiveExperience(xpGained)
 	return "{base} {damage} {xl}".format(base=baseMsg, damage=damageMsg, xl=xlChangedMessage)
