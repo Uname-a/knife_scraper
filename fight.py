@@ -294,11 +294,12 @@ def fight(bot, trigger):
 	# load the fighters
 	sourceFighter = fighter(bot.db, sourceNick)
 	targetFighter = fighter(bot.db, targetNick)
-	nextTimeSourceAvailable  = datetime.datetime.now()
+	nextTimeSourceAvailable  = currentTime
 	try:
 		nextTimeSourceAvailable = datetime.datetime.strptime(sourceFighter.delay, TimeFormat)
 	except ValueError as err:
-		# ignore this  since before time was used inconsistently 
+		# just reset the delay so that next time this will work
+		source.setTime(0)
 		pass
 	if nextTimeSourceAvailable >= currentTime:
 		duration = nextTimeSourceAvailable - currentTime
