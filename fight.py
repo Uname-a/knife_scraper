@@ -42,9 +42,9 @@ TimeFormat = "%Y-%m-%d %H:%M:%S.%f"
 # "Reeee {source} uses loud screech on {target} dealing {damage} damage!",
 # "Kaboom! {source} uses their dlc for SD to stab {target} for {damage} damage!"]
 
-MissStrings = [ "Oh no {source} misses {target} and deals no damage and cannot attack for {delay} mins"]
+MissStrings = [ "Oh no {source} misses {target} and deals no damage and cannot attack for {delay} seconds"]
 
-CritMissStrings = [ "Oh no {source} is confused and attacked themself for {damage} damage! and cannot attack for {delay} mins"]
+CritMissStrings = [ "Oh no {source} is confused and attacked themself for {damage} damage! and cannot attack for {delay} seconds"]
 
 class nickDBAssocation:
 	def __init__(self, db, UUID):
@@ -220,7 +220,7 @@ def fightImpl(source, target):
 	targetDied = False
 	sourceDied = False
 
-	attackMissTransition=20
+	attackMissTransition=40
 	damageMsg =""
 	#attack hits
 	if attack >= attackMissTransition:
@@ -327,6 +327,12 @@ def fighterStatus(bot, trigger):
 	else:
 		currentXp = bot.db.get_nick_value(targetNick,'xp')
 		remainingXp = xlMap[xl+1] - currentXp
+		
+		nextXl = xl+1
+		if nextXl in xlMap:
+			remainingXp = xlMap[nextXl] - currentXp
+		else:
+			remainingXp = "NO_NEXT_LEVEL"
 		bot.say('{nick} has {hp} / {max} hp @ Level {xl} with {remainingXp} xp until the next level'.format(nick=targetNick, hp=hitpoints,max=100 + (xl*10), xl=xl, remainingXp=remainingXp))
 
 @commands('level')
@@ -369,11 +375,12 @@ def Healing(bot, trigger):
 		return
 	targetNick = Identifier(trigger.group(2).strip())
 	sourceNick = trigger.nick
+	hitpoints = bot.db.get_nick_value(targetNick,'hitPoints')
 	if not hitpoints:
 		bot.say('I can''t find stats for {nick}'.format(nick=targetNick))
 		return
 
-	hitpoints = bot.db.get_nick_value(targetNick,'hitPoints')
+	
 	xl = bot.db.get_nick_value(targetNick,'xl')
 	max = 100 + (xl*3)
 	if hitpoints >= max:
