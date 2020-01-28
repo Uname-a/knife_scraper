@@ -220,7 +220,7 @@ def fightImpl(source, target):
 	damageMsg =""
 	#attack hits
 	if attack >= 50:
-		f = open("/home/botuser/knife_scraper/attack.txt")
+		f = open("/home/botuser/.sopel/attack.txt")
 		attack_list = f.readlines()
 		max_attack_list = len(attack_list)
 		attack_num = randint(0,max_attack_list-1)
