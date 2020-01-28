@@ -207,6 +207,7 @@ def fightImpl(source, target):
 	attack = random.randint(minAttack, maxAttack)
 	if attack < 95 or attack > 5:
 		attack += source.xl * 5
+	maxIndex = len(MissStrings) - 1 #will go away soon
 	index = random.randint(0, maxIndex)#will go away soon
 	damage = random.randint(minDamage, maxDamage) + source.xl 
 	# add modifiers 
@@ -232,7 +233,6 @@ def fightImpl(source, target):
 			targetDied = True
 	#attack misses
 	elif attack < 50:
-		maxIndex = len(MissStrings) - 1 #will go away soon
 		minDelay = 10
 		maxDelay = 60
 		delay = random.randint(minDelay, maxDelay)
