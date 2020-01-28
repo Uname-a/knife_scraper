@@ -223,7 +223,7 @@ def fightImpl(source, target):
 		f = open("/home/botuser/.sopel/attack.txt")
 		attack_list = f.readlines()
 		max_attack_list = len(attack_list)
-		attack_num = randint(0,max_attack_list-1)
+		attack_num = random.randint(0,max_attack_list-1)
 		#crit hit double damage
 		if attack >= 95:
 			damage = damage * 2 
@@ -256,8 +256,8 @@ def fightImpl(source, target):
 		source.setTime(delay)
 	else:
 		baseMsg = "uname fucked up somehow"
+
 	xlChangedMessage = ""
-	
 	if targetDied:
 		# A better method needs to be implemented, but basically the minimum fights would be 10
 		# to level up
