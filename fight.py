@@ -35,8 +35,6 @@ xlMap = {0:10,
 # This is the format string used by __str__ of datetime.datetime
 TimeFormat = "%Y-%m-%d %H:%M:%S.%f"
 
-# Format mfmt = 
-
 #fightStrings = [ "Bam boom pow! {source} stabs {target} for {damage} damage!",
 # "Krakow! {source} filets {target} for {damage} damage!",
 # "Reeee {source} uses loud screech on {target} dealing {damage} damage!",
@@ -296,7 +294,7 @@ def fight(bot, trigger):
 	# load the fighters
 	sourceFighter = fighter(bot.db, sourceNick)
 	targetFighter = fighter(bot.db, targetNick)
-	nextTimeSourceAvailable = datetime.strpfmt(sourceFighter.delay, TimeFormat)
+	nextTimeSourceAvailable = datetime.strptime(sourceFighter.delay, TimeFormat)
 	if nextTimeSourceAvailable >= currentTime:
 		duration = nextTimeSourceAvailable - currentTime
 		# we lie here a little 
