@@ -242,12 +242,12 @@ def fightImpl(source, target):
 		#crit misses attack self
 		if attack <= 5:
 			damage = damage * 2 
-			baseMsg = CritMissStrings[index].format(source=source.nick, damage=damage)
+			baseMsg = CritMissStrings[index].format(source=source.nick, damage=damage, delay=delay)
 			damageMsg = source.receiveDamage(damage)
 			if damageMsg:
 				targetDied = True
 		else:
-			baseMsg = MissStrings[index].format(source=source.nick, target=target.nick)
+			baseMsg = MissStrings[index].format(source=source.nick, target=target.nick, delay=delay)
 			damageMsg = target.receiveDamage(damage)
 			# source managed to kill themselves
 			if damageMsg:
