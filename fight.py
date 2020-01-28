@@ -145,7 +145,7 @@ class fighter:
 		msg = ""
 		if self.hitPoints < damage:
 			msg = " {nick} has died !".format(nick=self.nick)
-			self.db.set_nick_value(self.nick, "hitPoints", 100 + (xl * 10))
+			self.db.set_nick_value(self.nick, "hitPoints", 100 + (self.xl * 10))
 		else:
 			newhp = self.hitPoints - damage
 			self.db.set_nick_value(self.nick, "hitPoints", newhp)
