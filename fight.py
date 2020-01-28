@@ -139,7 +139,7 @@ class fighter:
 			db.set_nick_value(nick, "hitPoints", self.hitPoints)
 		if not self.delay:
 			self.delay = 0
-			db.set_nick_value(nick, "time", self.delay)
+			db.set_nick_value(nick, "delay", self.delay)
 	@property
 	def store(self):
 		return self._store
@@ -209,10 +209,9 @@ def fightImpl(source, target):
 	minAttack = 1
 	maxAttack = 100
 	attack = random.randint(minAttack, maxAttack)
-	if attack < 95 or attack > 5:
+	if attack < 95 and attack > 5:
 		attack += source.xl * 5
-	maxIndex = len(MissStrings) - 1 #will go away soon
-	index = random.randint(0, maxIndex)#will go away soon
+	index = 0 #to be removed with miss and crit changes
 	damage = random.randint(minDamage, maxDamage) + source.xl 
 	# add modifiers 
 	attack -= target.defense * 3
@@ -221,7 +220,7 @@ def fightImpl(source, target):
 	targetDied = False
 	sourceDied = False
 
-	attackMissTransition=15
+	attackMissTransition=20
 	damageMsg =""
 	#attack hits
 	if attack >= attackMissTransition:
@@ -299,7 +298,7 @@ def fight(bot, trigger):
 	nextTimeSourceAvailable  = currentTime
 	try:
 		nextTimeSourceAvailable = datetime.datetime.strptime(sourceFighter.delay, TimeFormat)
-	except ValueError as err:
+	except (ValueError, TypeError) as err:
 		# just reset the delay so that next time this will work
 		sourceFighter.setTime(0)
 		pass
