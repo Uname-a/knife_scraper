@@ -294,7 +294,7 @@ def fight(bot, trigger):
 	# load the fighters
 	sourceFighter = fighter(bot.db, sourceNick)
 	targetFighter = fighter(bot.db, targetNick)
-	nextTimeSourceAvailable = datetime.strptime(sourceFighter.delay, TimeFormat)
+	nextTimeSourceAvailable = datetime.datetime.strptime(sourceFighter.delay, TimeFormat)
 	if nextTimeSourceAvailable >= currentTime:
 		duration = nextTimeSourceAvailable - currentTime
 		# we lie here a little 
