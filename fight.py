@@ -397,7 +397,7 @@ def Healing(bot, trigger):
 		newHealth = hitpoints + Heal
 		targetFighter.setHealth(newHealth)
 		bot.say('{nick} has healed {target} for {heal} hit points and now has {hp} / {maxH} hitpoints'.format(nick=sourceNick,target=targetNick,heal=Heal,hp=hitpoints,maxH=max, xl=xl))
-		sourceFighter.setHoly(SourceFighter.holy + 1)
+		SourceFighter.setHoly(SourceFighter.holy + 1)
 
 
 @commands('smite')
@@ -438,7 +438,7 @@ def smite(bot, trigger):
 		if Holy >= 90:
 			msg = '{nick} has called upon the gods to smite {target} and has been answered'.format(nick=sourceNick,target=targetNick)
 			bot.say(msg)
-			bot.say(mstargetFighter.receiveDamage(75))
+			bot.say(targetFighter.receiveDamage(75))
 		else:
 			msg = '{nick} has called upon the gods to smite {target} and has been ignored'.format(nick=sourceNick,target=targetNick)
 			bot.say(msg)
