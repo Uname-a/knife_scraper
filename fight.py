@@ -21,6 +21,7 @@ import random
 # stop  = log10(10000)
 # nsteps = 5
 # spacing = floor(logspace(start,stop,nsteps))
+xlStop = 10000
 xlMap = {0:10,
 	1:31,
 	2:100,
@@ -29,7 +30,12 @@ xlMap = {0:10,
 	5:1778,
 	6:3162,
 	7:5623,
-	8:10000}
+	8:xlStop}
+
+# This is the format string used by __str__ of datetime.datetime
+TimeFormat = "%Y-%m-%d %H:%M:%S.%f"
+
+# Format mfmt = 
 
 #fightStrings = [ "Bam boom pow! {source} stabs {target} for {damage} damage!",
 # "Krakow! {source} filets {target} for {damage} damage!",
@@ -61,7 +67,7 @@ class DatabaseProperty:
 		# validate that the property exists - if not create it (by setting the value in the DB)
 		prop = self.value
 		if not prop:
-			self.set(propDefaultValue)
+			self.value = propDefaultValue
 	@property
 	def key(self):
 		return self._key
@@ -156,7 +162,7 @@ class fighter:
 	def setHealth(self, newHealth):
 		self.db.set_nick_value(self.nick, "hitPoints", newHealth) 
 	def setTime(self,delay):
-		self.db.set_nick_value(self.nick, "delay", (datetime.datetime.now() + datetime.timedelta(seconds=delay)).strftime("%y%m%d%H%M%S"))
+		self.db.set_nick_value(self.nick, "delay", (datetime.datetime.now() + datetime.timedelta(seconds=delay)).strftime(TimeFormat))
 	def setPower(self, newXl):
 		self.db.set_nick_value(self.nick, "power", newXl)
 	def setSpeed(self, newXl):
@@ -198,8 +204,6 @@ def fightImpl(source, target):
 	
 	minDamage = 1
 	maxDamage = 25
-	minXpGain = 2
-	maxXpGain = 30
 	minAttack = 1
 	maxAttack = 100
 	attack = random.randint(minAttack, maxAttack)
@@ -211,6 +215,8 @@ def fightImpl(source, target):
 	attack -= target.defense * 3
 	damage += source.power * 3
 
+	targetDied = False
+	sourceDied = False
 
 	damageMsg =""
 	#attack hits
@@ -224,6 +230,8 @@ def fightImpl(source, target):
 			damage = damage * 2 
 		baseMsg = attack_list[attack_num].format(source=source.nick, target=target.nick, damage=damage)
 		damageMsg = target.receiveDamage(damage)
+		if damageMsg:
+			targetDied = True
 	#attack misses
 	elif attack < 50:
 		maxIndex = len(MissStrings) - 1 #will go away soon
@@ -231,20 +239,32 @@ def fightImpl(source, target):
 		maxDelay = 60
 		delay = random.randint(minDelay, maxDelay)
 		delay -= source.speed * 5
+		# clamp delay to be 0
+		delay = max(delay, 0)
 		#crit misses attack self
 		if attack <= 5:
 			damage = damage * 2 
 			baseMsg = CritMissStrings[index].format(source=source.nick, damage=damage)
 			damageMsg = source.receiveDamage(damage)
+			if damageMsg:
+				targetDied = True
 		else:
 			baseMsg = MissStrings[index].format(source=source.nick, target=target.nick)
+			damageMsg = target.receiveDamage(damage)
+			# source managed to kill themselves
+			if damageMsg:
+				sourceDied = True
+				damageMsg  = "I can't believe you've done this. " + damageMsg
 		source.setTime(delay)
 	else:
 		baseMsg = "uname fucked up somehow"
 	xlChangedMessage = ""
 	
-	if damageMsg:
-		# Generate some random xp:
+	if targetDied:
+		# A better method needs to be implemented, but basically the minimum fights would be 10
+		# to level up
+		minXpGain = 2
+		maxXpGain = xlMap[target.xl] / 10 if target.xl in xlMap else  xlStop / 10
 		xpGained = random.randint(minXpGain, maxXpGain)
 		xlChangedMessage = source.receiveExperience(xpGained)
 	return "{base} {damage} {xl}".format(base=baseMsg, damage=damageMsg, xl=xlChangedMessage)
@@ -252,9 +272,11 @@ def fightImpl(source, target):
 @commands('fight')
 @example('.fight pf')
 def fight(bot, trigger):
+	# get this right away
+	currentTime = datetime.datetime.now()
 	sourceNick = trigger.nick
 	channel = trigger.sender
-	
+
 	if not trigger.group(2):
 		bot.say('fight whosits?')
 		return
@@ -274,9 +296,12 @@ def fight(bot, trigger):
 	# load the fighters
 	sourceFighter = fighter(bot.db, sourceNick)
 	targetFighter = fighter(bot.db, targetNick)
-	if int(sourceFighter.delay) >= int(datetime.datetime.now().strftime("%y%m%d%H%M%S")):
-        tt= int(sourceFighter.delay) - int(datetime.datetime.now().strftime("%y%m%d%H%M%S"))
-		bot.reply('{target} cannot attack for {time} more seconds'.format(target=sourceNick, time=tt))
+	nextTimeSourceAvailable = datetime.strpfmt(sourceFighter.delay, TimeFormat)
+	if nextTimeSourceAvailable >= currentTime:
+        duration = nextTimeSourceAvailable - currentTime
+		# we lie here a little 
+		durationInSeconds = int(duration.total_seconds()) if duration.total_seconds() > 0 else 1
+		bot.reply('{target} cannot attack for {time} more seconds'.format(target=sourceNick, time=durationInSeconds))
 		return
 	msg = fightImpl(sourceFighter, targetFighter)
 	bot.say(msg)
@@ -295,7 +320,7 @@ def fighterStatus(bot, trigger):
 		bot.say('I can''t find stats for {nick}'.format(nick=targetNick))
 		return
 	else:
-		bot.say('{nick} has {hp} hit points / {max} @ Level {xl} with {xp} xp until the next level'.format(nick=targetNick, hp=hitpoints,max=100 + (xl*3), xl=xl,xp=xlMap[bot.db.get_nick_value(targetNick,'xl') + 1] - bot.db.get_nick_value(targetNick,'xp')))
+		bot.say('{nick} has {hp} / {max} hp @ Level {xl} with {xp} xp until the next level'.format(nick=targetNick, hp=hitpoints,max=100 + (xl*3), xl=xl,xp=xlMap[bot.db.get_nick_value(targetNick,'xl') + 1] - bot.db.get_nick_value(targetNick,'xp')))
 
 @commands('level')
 @example('.level power')
