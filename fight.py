@@ -382,6 +382,9 @@ def Healing(bot, trigger):
 		return
 	targetNick = Identifier(trigger.group(2).strip())
 	sourceNick = trigger.nick
+	if sourceNick = targetNick:
+		bot.say('No')
+		return
 	hitpoints = bot.db.get_nick_value(targetNick,'hitPoints')
 	if not hitpoints:
 		bot.say('I can''t find stats for {nick}'.format(nick=targetNick))
