@@ -105,7 +105,7 @@ class fighter:
 		self.nick = nick
 		self.xl = db.get_nick_value(nick, "xl")
 		self.delay = db.get_nick_value(nick, "delay")
-		self.la = db.get_nick_value(nick, "la")
+		self._la = db.get_nick_value(nick, "la")
 		self.speed = db.get_nick_value(nick, "speed")
 		self.power = db.get_nick_value(nick, "power")
 		self.defense = db.get_nick_value(nick, "defense")
@@ -140,6 +140,10 @@ class fighter:
 		if not self.delay:
 			self.delay = 0
 			db.set_nick_value(nick, "delay", self.delay)
+	@property
+	def la(self):
+		self._la = db.get_nick_value(nick, "la")
+		return self._la
 	@property
 	def store(self):
 		return self._store
@@ -187,11 +191,15 @@ class fightEvents:
 		newXl = aFighter.xl
 		newXp = gainedXp + aFighter.xp
 		temp = 0
-		while xlMap[newXl] < newXp:
+		while newXl in xlMap and xlMap[newXl] < newXp:
 			newXl += 1
 			temp +=1
 		xlDiff = newXl - aFighter.xl
 		
+		# if maxed out don't generate a message, just return early
+		if newXl not in xlMap:
+			return
+		# cap xl gain
 		if xlDiff > 0:
 			aFighter.setXl(newXl)
 			aFighter.adjustLA(temp)
@@ -326,8 +334,7 @@ def fighterStatus(bot, trigger):
 		return
 	else:
 		currentXp = bot.db.get_nick_value(targetNick,'xp')
-		remainingXp = xlMap[xl+1] - currentXp
-		
+		remainingXp = 0 
 		nextXl = xl+1
 		if nextXl in xlMap:
 			remainingXp = xlMap[nextXl] - currentXp
