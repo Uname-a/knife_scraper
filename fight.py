@@ -142,7 +142,7 @@ class fighter:
 			db.set_nick_value(nick, "delay", self.delay)
 	@property
 	def la(self):
-		self._la = self.store.db.get_nick_value(nick, "la")
+		self._la = self.store.db.get_nick_value(self.nick, "la")
 		return self._la
 	@property
 	def store(self):
