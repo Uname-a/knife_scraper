@@ -422,20 +422,12 @@ def smite(bot, trigger):
 	# load the fighters
 	sourceFighter = fighter(bot.db, sourceNick)
 	targetFighter = fighter(bot.db, targetNick)
-	if sourceFighter.holy > 0 :
+	if sourceFighter.holy > 4 :
 		minHoly = 1
 		maxHoly = 100
 		Holy = random.randint(minHoly, maxHoly)
-		if sourceFighter.holy >= 100:
-			Holy = 80
-			sourceFighter.setHoly(sourceFighter.holy - 100)
-		else:
-			if (sourceFighter.holy + Holy) > 80:
-				Holy = 80
-			else:
-				Holy += sourceFighter.holy 
-			sourceFighter.setHoly(0)
-		if Holy >= 90:
+		sourceFighter.setHoly(sourceFighter.holy - 5)
+		if Holy >= 95:
 			msg = '{nick} has called upon the gods to smite {target} and has been answered'.format(nick=sourceNick,target=targetNick)
 			bot.say(msg)
 			bot.say(targetFighter.receiveDamage(75))
