@@ -400,10 +400,12 @@ def Healing(bot, trigger):
 		maxHeal = 25
 		Heal = random.randint(minHeal, maxHeal)
 		if (Heal + hitpoints) > max:
-			Heal -= (Heal + hitpoints) - 100 + (xl*3)
-		newHealth = hitpoints + Heal
-		targetFighter.setHealth(newHealth)
-		bot.say('{nick} has healed {target} for {heal} hit points and now has {hp} / {maxH} hitpoints'.format(nick=sourceNick,target=targetNick,heal=Heal,hp=hitpoints,maxH=max, xl=xl))
+			targetFighter.setHealth(max)
+			bot.say('{nick} has healed {target} to full health'.format(nick=sourceNick,target=targetNick))
+		else:
+			newHealth = hitpoints + Heal
+			targetFighter.setHealth(newHealth)
+			bot.say('{nick} has healed {target} for {heal} hit points and now has {hp} / {maxH} hitpoints'.format(nick=sourceNick,target=targetNick,heal=Heal,hp=hitpoints,maxH=max, xl=xl))
 		SourceFighter.setHoly(SourceFighter.holy + 1)
 
 
