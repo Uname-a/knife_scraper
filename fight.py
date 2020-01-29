@@ -112,7 +112,7 @@ class fighter:
 		self.holy = db.get_nick_value(nick, "holy")
 
 		if not self.la:
-			self.la = 0
+			self._la = 0
 			db.set_nick_value(nick, "la", self.la)
 		if not self.speed:
 			self.speed = 0
