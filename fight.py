@@ -434,14 +434,14 @@ def smite(bot, trigger):
 		maxHoly = 100
 		Holy = random.randint(minHoly, maxHoly)
 		sourceFighter.setHoly(sourceFighter.holy - 5)
-		if Holy >= 95:
+		if Holy >= 90:
 			msg = '{nick} has called upon the gods to smite {target} and has been answered'.format(nick=sourceNick,target=targetNick)
 			bot.say(msg)
-			bot.say(targetFighter.receiveDamage(75))
+			bot.say(targetFighter.receiveDamage(150))
 		else:
 			msg = '{nick} has called upon the gods to smite {target} and has been ignored'.format(nick=sourceNick,target=targetNick)
 			bot.say(msg)
 	else:
-		bot.say('You have no holy points')
+		bot.say('You dont have enough holy points')
 		return
 	
