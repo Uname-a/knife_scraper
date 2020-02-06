@@ -208,7 +208,7 @@ class fightEvents:
 		msg = "You gained {totalLevels} experience level".format(totalLevels=xlDiff)
 		if xlDiff  > 1:
 			msg += "s"
-		return msg;
+		return msg
 #todo add benifits to levels aka attack chance and armor?
 def fightImpl(source, target):
 	
@@ -255,9 +255,9 @@ def fightImpl(source, target):
 		if attack <= 5:
 			damage = damage * 2 
 			baseMsg = CritMissStrings[index].format(source=source.nick, damage=damage, delay=delay)
+			damageMsg = source.receiveDamage(damage)
 		else:
 			baseMsg = MissStrings[index].format(source=source.nick, target=target.nick, delay=delay)
-		damageMsg = source.receiveDamage(damage)
 		# source managed to kill themselves
 		if damageMsg:
 			sourceDied = True
@@ -392,7 +392,7 @@ def Healing(bot, trigger):
 
 	
 	xl = bot.db.get_nick_value(targetNick,'xl')
-	max = 100 + (xl*3)
+	max = 100 + (xl*10)
 	if hitpoints >= max:
 		bot.say('{nick} is already at full health'.format(nick=targetNick))
 		return
