@@ -257,9 +257,10 @@ def fightImpl(source, target):
 			baseMsg = CritMissStrings[index].format(source=source.nick, damage=damage, delay=delay)
 			damageMsg = source.receiveDamage(damage)
 		else:
+			damage = 0
 			baseMsg = MissStrings[index].format(source=source.nick, target=target.nick, delay=delay)
 		# source managed to kill themselves
-		if damageMsg:
+		if damageMsg != "":
 			sourceDied = True
 			damageMsg  = "I can't believe you've done this. " + damageMsg
 		source.setTime(delay)
