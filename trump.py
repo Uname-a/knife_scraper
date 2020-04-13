@@ -19,5 +19,5 @@ def trumpDisaster(bot, trigger):
     bot.say('TOTAL DISASTER.')
 
 @module.rule('.*carol baskin.*')
-def trumpDisaster(bot, trigger):
+def baskin(bot, trigger):
     bot.say('THAT BITCH.')
