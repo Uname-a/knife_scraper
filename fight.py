@@ -219,11 +219,14 @@ def fightImpl(source, target):
 	attack = random.randint(minAttack, maxAttack)
 	if attack < 95 and attack > 5:
 		attack += source.xl * 5
+
 	index = 0 #to be removed with miss and crit changes
+
 	damage = random.randint(minDamage, maxDamage) + source.xl 
 	# add modifiers 
 	attack -= target.defense * 3
 	damage += source.power * 3
+
 
 	targetDied = False
 	sourceDied = False
@@ -257,12 +260,14 @@ def fightImpl(source, target):
 			baseMsg = CritMissStrings[index].format(source=source.nick, damage=damage, delay=delay)
 			damageMsg = source.receiveDamage(damage)
 		else:
+
 			damage = 0
 			baseMsg = MissStrings[index].format(source=source.nick, target=target.nick, delay=delay)
 		# source managed to kill themselves
 		if damageMsg != "":
 			sourceDied = True
 			damageMsg  = "I can't believe you've done this. " + damageMsg
+
 		source.setTime(delay)
 	else:
 		baseMsg = "uname fucked up somehow"
@@ -317,6 +322,7 @@ def fight(bot, trigger):
 		durationInSeconds = int(duration.total_seconds()) if duration.total_seconds() > 0 else 1
 		bot.reply('{target} cannot attack for {time} more seconds'.format(target=sourceNick, time=durationInSeconds))
 		return
+		
 	msg = fightImpl(sourceFighter, targetFighter)
 	bot.say(msg)
 
@@ -374,6 +380,7 @@ def Leveling(bot, trigger):
 	else:
 		bot.say('pick power, speed, or defense aka .level power')
 		return
+
 
 @commands('heal')
 @example('.heal fooobarrr')
@@ -450,4 +457,63 @@ def smite(bot, trigger):
 	else:
 		bot.say('You dont have enough holy points')
 		return
-	
+
+
+
+@commands('level')
+@example('.level power')
+def Leveling(bot, trigger):
+	sourceNick = trigger.nick
+	trigger.group(2)
+	if not trigger.group(2):
+		bot.say('pick power, speed, or defense aka .level power')
+		return
+	power = Identifier(trigger.group(2).strip())
+	target = fighter(bot.db, sourceNick)
+	if target.la <=0:
+		bot.say('you have no levels available to spend')
+		return
+	elif power == "power" :
+		target.setPower(target.power + 1)
+		target.setLA(-1)
+		bot.say('power is now {power} and you have {level}s left'.format(power=target.power,level=target.la))
+	elif power == "speed":
+		target.setSpeed(target.speed + 1)
+		target.setLA(-1)
+		bot.say('speed is now {power} and you have {level}s left'.format(power=target.speed,level=target.la))
+	elif power == "defense":
+		target.setDef(target.defense + 1)
+		target.setLA(-1)
+		bot.say('defense is now {power} and you have {level}s left'.format(power=target.defense,level=target.la))
+	else:
+		bot.say('pick power, speed, or defense aka .level power')
+		return
+@commands('heal')
+@example('.heal fooobarrr')
+def Healing(bot, trigger):
+	if not trigger.group(2):
+		bot.say('Heal who?')
+		return
+	targetNick = Identifier(trigger.group(2).strip())
+	sourceNick = trigger.nick
+	hitpoints = bot.db.get_nick_value(targetNick,'hitPoints')
+	if not hitpoints:
+		bot.say('I can''t find stats for {nick}'.format(nick=targetNick))
+		return
+	xl = bot.db.get_nick_value(targetNick,'xl')
+	maxx = 100 + (xl*3)
+	if hitpoints >= maxx:
+		bot.say('{nick} is already at full health'.format(nick=targetNick))
+		return
+	else:
+		targetFighter = fighter(bot.db, targetNick)
+		SourceFighter = fighter(bot.db, sourceNick)
+		minHeal = 5
+		maxHeal = 25
+		Heal = random.randint(minHeal, maxHeal)
+		if (Heal + hitpoints) > maxx:
+			Heal -= (Heal + hitpoints) - 100 + (SourceFighter.xl*3)
+		newHealth = hitpoints + Heal
+		targetFighter.setHealth(newHealth)
+		bot.say('{nick} has healed {target} for {heal} hit points and now has {hp} / {maxH} hitpoints'.format(nick=sourceNick,target=targetNick,heal=Heal,hp=hitpoints,maxH=maxx))
+		SourceFighter.setHoly(SourceFighter.holy + 1)
