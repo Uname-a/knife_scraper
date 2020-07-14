@@ -12,7 +12,7 @@ from random import randint
 @module.rate(10)
 def knife(bot, trigger):
     """ Tell someone a wonderful fact about cats """
-    f = open("~/knife_scraper/cat_facts.txt")
+    f = open("/home/botuser/knife_scraper/cat_facts.txt")
     fact_list = f.readlines()
     max_fact = len(fact_list)
     fact_num = randint(0,max_fact-1)
